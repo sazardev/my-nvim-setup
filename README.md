@@ -32,6 +32,7 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 | `<leader>tt` | Toggle float terminal |
 | `<leader>gg` | Open lazygit |
 | `<leader>gd` | Open lazydocker |
+| `<leader>gb` | Toggle git blame inline |
 | `<leader>du` | Toggle DAP UI |
 | `<leader>xx` | Diagnostics (Trouble) |
 | `<leader>xb` | Buffer diagnostics |

@@ -28,6 +28,8 @@ return {
         "dart",
         -- Astro
         "astro",
+        -- rest.nvim (parser HTTP)
+        "http",
       },
     },
     init = function()
@@ -156,30 +158,28 @@ return {
     opts = {},
   },
 
-  -- ── Telescope: mostrar archivos ignorados por git (.env, etc.) ───────────
+  -- ── Telescope: respeta .gitignore (rápido), muestra dotfiles ─────────────
   {
     "nvim-telescope/telescope.nvim",
     opts = {
       pickers = {
         find_files = {
           hidden = true,
-          no_ignore = true,
-          no_ignore_parent = true,
         },
       },
     },
   },
 
-  -- ── nvim-tree: mostrar archivos ignorados por git ─────────────────────────
+  -- ── nvim-tree: oculta git-ignored (rápido), muestra dotfiles ──────────────
   {
     "nvim-tree/nvim-tree.lua",
     opts = {
       git = {
-        ignore = false,
+        ignore = true,
       },
       filters = {
         dotfiles = false,
-        git_ignored = false,
+        git_ignored = true,
       },
     },
   },
@@ -248,16 +248,21 @@ return {
     "rest-nvim/rest.nvim",
     ft = "http",
     dependencies = { "nvim-lua/plenary.nvim" },
+    build = false, -- evitar LuaRocks (tree-sitter-http falla en Windows)
     opts = {},
   },
 
-  -- ── Git blame inline ─────────────────────────────────────────────────────
+  -- ── Git blame inline (manual via keymap, sin overhead al abrir archivos) ──
   {
     "f-person/git-blame.nvim",
-    event = "BufRead",
+    cmd = "GitBlameToggle",
+    keys = {
+      { "<leader>gb", "<cmd>GitBlameToggle<cr>", desc = "Toggle git blame" },
+    },
     opts = {
       date_format = "%Y-%m-%d %H:%M",
       virtual_text_column = 80,
+      enabled = false,
     },
   },
 }

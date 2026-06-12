@@ -29,7 +29,12 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 | Terminal | toggleterm, lazygit, lazydocker (via TermExec) |
 | Other | Telescope, nvim-tree, Copilot+cmp, Trouble, fidget, autotag, rest.nvim, git-blame |
 
-## Custom filetypes
+## Performance
+
+- **git-blame** is off by default — toggle with `<leader>gb` (no `BufRead` overhead)
+- **Telescope** respects `.gitignore` in `find_files` (skip `node_modules`, `dist/`, etc.)
+- **nvim-tree** hides git-ignored dirs by default — toggle with `I` or `git.ignore = false`
+- Plugins are lazy-loaded via events, ft, cmd, or keys (not on startup)
 
 - `ftdetect/yarnspinner.vim` — `*.yarn` → `yarnspinner` filetype
 - `syntax/yarnspinner.vim` — syntax highlighting for YarnSpinner dialogue scripts

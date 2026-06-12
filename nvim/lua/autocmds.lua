@@ -12,3 +12,11 @@ vim.api.nvim_create_autocmd("UIEnter", {
     end
   end,
 })
+
+-- Forzar cmdheight=0 tras carga completa (pisa cualquier plugin que lo reseteé)
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    vim.o.cmdheight = 0
+  end,
+})
