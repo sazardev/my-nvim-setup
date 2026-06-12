@@ -7,11 +7,12 @@ local M = {}
 
 M.base46 = {
   theme = "gruvbox",
+  theme_toggle = { "gruvbox", "gruvbox_light" },
 
-  -- hl_override = {
-  -- 	Comment = { italic = true },
-  -- 	["@comment"] = { italic = true },
-  -- },
+  hl_override = {
+    Comment = { italic = true },
+    ["@comment"] = { italic = true },
+  },
 }
 
 M.nvdash = {
@@ -44,7 +45,7 @@ M.nvdash = {
     local btns = {}
 
     -- ── Git info (clean, no icons) ──
-    table.insert(btns, { txt = "─", hl = "NvDashFooter", no_gap = true, rep = true })
+    table.insert(btns, { txt = " ", hl = "NvDashFooter", no_gap = true, rep = true })
     if repo ~= "" then
       local line = branch ~= "" and ("  " .. repo .. " (" .. branch .. ")") or ("  " .. repo)
       table.insert(btns, { txt = line, hl = "NvDashFooter", no_gap = true, content = "fit" })
@@ -52,21 +53,25 @@ M.nvdash = {
     if user ~= "" then
       table.insert(btns, { txt = "  " .. user, hl = "Comment", no_gap = true, content = "fit" })
     end
-    table.insert(btns, { txt = "─", hl = "NvDashFooter", no_gap = true, rep = true })
+    table.insert(btns, { txt = " ", hl = "NvDashFooter", no_gap = true, rep = true })
 
     -- ── Action buttons ──
     vim.list_extend(btns, {
-      { txt = "    Find File", keys = "ff", cmd = "Telescope find_files" },
-      { txt = "    Recent Files", keys = "fo", cmd = "Telescope oldfiles" },
-      { txt = "  󰈭  Find Word", keys = "fw", cmd = "Telescope live_grep" },
-      { txt = "  󱥚  Themes", keys = "th", cmd = ":lua require('nvchad.themes').open()" },
-      { txt = "    Mappings", keys = "ch", cmd = "NvCheatsheet" },
+      { txt = "  Find File", keys = "ff", cmd = "Telescope find_files" },
+      { txt = "  Recent Files", keys = "fo", cmd = "Telescope oldfiles" },
+      { txt = "  Find Word", keys = "fw", cmd = "Telescope live_grep" },
+      { txt = "  Themes", keys = "th", cmd = ":lua require('nvchad.themes').open()" },
+      { txt = "  Mappings", keys = "ch", cmd = "NvCheatsheet" },
     })
 
     return btns
   end,
 }
 M.ui = {
+  statusline = {
+    separator_style = "round",
+    order = { "mode", "file", "git", "%=", "diagnostics", "lsp", "cwd", "cursor" },
+  },
   tabufline = {
     lazyload = false,
     position = "top",

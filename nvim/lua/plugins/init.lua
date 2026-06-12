@@ -4,6 +4,9 @@ return {
     "stevearc/conform.nvim",
     event = "BufWritePre",
     opts = require "configs.conform",
+    config = function(_, opts)
+      require("conform").setup(opts)
+    end,
   },
 
   -- ── LSP ───────────────────────────────────────────────────────────────────
@@ -19,12 +22,25 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
-        "vim", "lua", "vimdoc",
-        "html", "css",
-        "javascript", "typescript", "tsx",
-        "prisma", "dockerfile", "dotenv",
-        "go", "gomod", "gosum", "gowork",
-        "json", "yaml", "toml", "markdown",
+        "vim",
+        "lua",
+        "vimdoc",
+        "html",
+        "css",
+        "javascript",
+        "typescript",
+        "tsx",
+        "prisma",
+        "dockerfile",
+        "dotenv",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "json",
+        "yaml",
+        "toml",
+        "markdown",
         "dart",
         -- Astro
         "astro",
@@ -32,6 +48,9 @@ return {
         "http",
       },
     },
+    config = function(_, opts)
+      require("nvim-treesitter").setup(opts)
+    end,
     init = function()
       -- Forzar gcc en Windows (evita buscar cl.exe/MSVC)
       require("nvim-treesitter.install").compilers = { "gcc" }
@@ -86,7 +105,15 @@ return {
   },
   {
     "rcarriga/nvim-dap-ui",
-    keys = { { "<leader>du", function() require("dapui").toggle() end, desc = "Toggle DAP UI" } },
+    keys = {
+      {
+        "<leader>du",
+        function()
+          require("dapui").toggle()
+        end,
+        desc = "Toggle DAP UI",
+      },
+    },
     dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
     config = function()
       require("dapui").setup()
@@ -102,14 +129,12 @@ return {
       { "<leader>xb", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },
     },
     opts = {},
+    config = function(_, opts)
+      require("trouble").setup(opts)
+    end,
   },
 
-  -- ── LSP progress indicator ────────────────────────────────────────────────
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts = {},
-  },
+  -- LSP progress → replaced by noice.nvim (loaded below)
 
   -- ── Mason: auto-instalar todos los tools ─────────────────────────────────
   {
@@ -120,9 +145,12 @@ return {
         -- Lua
         "stylua",
         -- Go
-        "goimports", "gofumpt", "golangci-lint",
+        "goimports",
+        "gofumpt",
+        "golangci-lint",
         -- JS / TS / React
-        "prettier", "eslint_d",
+        "prettier",
+        "eslint_d",
         -- Markdown
         "markdownlint-cli2",
         -- Otros
@@ -143,6 +171,9 @@ return {
       auto_update = false,
       run_on_start = true,
     },
+    config = function(_, opts)
+      require("mason-tool-installer").setup(opts)
+    end,
   },
 
   -- ── SchemaStore (schemas para JSON LSP: tsconfig, package.json, etc.) ──────
@@ -156,11 +187,21 @@ return {
     "windwp/nvim-ts-autotag",
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
+    config = function(_, opts)
+      require("nvim-ts-autotag").setup(opts)
+    end,
   },
 
   -- ── Telescope: respeta .gitignore (rápido), muestra dotfiles ─────────────
   {
     "nvim-telescope/telescope.nvim",
+    dependencies = {
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+        enabled = vim.fn.executable "cmake" == 1,
+      },
+    },
     opts = {
       pickers = {
         find_files = {
@@ -168,6 +209,9 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      require("telescope").setup(opts)
+    end,
   },
 
   -- ── nvim-tree: oculta git-ignored (rápido), muestra dotfiles ──────────────
@@ -182,6 +226,9 @@ return {
         git_ignored = true,
       },
     },
+    config = function(_, opts)
+      require("nvim-tree").setup(opts)
+    end,
   },
 
   -- ── GitHub Copilot ────────────────────────────────────────────────────────
@@ -196,6 +243,9 @@ return {
         ["*"] = true, -- activar en todos los tipos de archivo
       },
     },
+    config = function(_, opts)
+      require("copilot").setup(opts)
+    end,
   },
   {
     "zbirenbaum/copilot-cmp",
@@ -216,6 +266,9 @@ return {
       })
       return opts
     end,
+    config = function(_, opts)
+      require("cmp").setup(opts)
+    end,
   },
 
   -- ── Terminal (lazygit, lazydocker, etc.) ───────────────────────────────────
@@ -223,13 +276,22 @@ return {
     "akinsho/toggleterm.nvim",
     cmd = { "ToggleTerm", "TermExec" },
     keys = {
-      { "<leader>tt", function() require("toggleterm").toggle() end, desc = "Toggle float terminal" },
+      {
+        "<leader>tt",
+        function()
+          require("toggleterm").toggle()
+        end,
+        desc = "Toggle float terminal",
+      },
     },
     opts = {
       size = 0.6,
       open_mapping = false,
       direction = "float",
     },
+    config = function(_, opts)
+      require("toggleterm").setup(opts)
+    end,
   },
 
   -- ── lazygit integration ────────────────────────────────────────────────────
@@ -250,6 +312,9 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     build = false, -- evitar LuaRocks (tree-sitter-http falla en Windows)
     opts = {},
+    config = function(_, opts)
+      require("rest-nvim").setup(opts)
+    end,
   },
 
   -- ── Git blame inline (manual via keymap, sin overhead al abrir archivos) ──
@@ -264,6 +329,9 @@ return {
       virtual_text_column = 80,
       enabled = false,
     },
+    config = function(_, opts)
+      require("gitblame").setup(opts)
+    end,
   },
 
   -- ── Treesitter context (función/clase actual al hacer scroll) ───────────
@@ -277,19 +345,22 @@ return {
       mode = "cursor",
       separator = "─",
     },
+    config = function(_, opts)
+      require("treesitter-context").setup(opts)
+    end,
   },
 
   -- ── Surround: añadir/quitar/cambiar delimitadores ────────────────────────
   {
     "echasnovski/mini.surround",
     keys = {
-      { "sa",  mode = { "n", "x" }, desc = "Add surrounding" },
-      { "sd",  mode = "n", desc = "Delete surrounding" },
-      { "sr",  mode = "n", desc = "Replace surrounding" },
-      { "sh",  mode = "n", desc = "Highlight surrounding" },
-      { "sF",  mode = "n", desc = "Find right surrounding" },
-      { "sf",  mode = "n", desc = "Find left surrounding" },
-      { "sn",  mode = "n", desc = "Update n_lines" },
+      { "sa", mode = { "n", "x" }, desc = "Add surrounding" },
+      { "sd", mode = "n", desc = "Delete surrounding" },
+      { "sr", mode = "n", desc = "Replace surrounding" },
+      { "sh", mode = "n", desc = "Highlight surrounding" },
+      { "sF", mode = "n", desc = "Find right surrounding" },
+      { "sf", mode = "n", desc = "Find left surrounding" },
+      { "sn", mode = "n", desc = "Update n_lines" },
     },
     opts = {
       mappings = {
@@ -302,6 +373,9 @@ return {
         update_n_lines = "sn",
       },
     },
+    config = function(_, opts)
+      require("mini.surround").setup(opts)
+    end,
   },
 
   -- ── UI pulida para vim.ui.select/input (LSP rename, code actions) ────────
@@ -309,6 +383,9 @@ return {
     "stevearc/dressing.nvim",
     event = "VeryLazy",
     opts = {},
+    config = function(_, opts)
+      require("dressing").setup(opts)
+    end,
   },
 
   -- ── Highlight word under cursor (ilumina todas las ocurrencias) ──────────
@@ -319,6 +396,9 @@ return {
       delay = 200,
       filetypes_denylist = { "NvimTree", "TelescopePrompt", "alpha", "dashboard", "lazy", "mason", "nvdash" },
     },
+    config = function(_, opts)
+      require("illuminate").configure(opts)
+    end,
   },
 
   -- ── Indent scope indicator (línea animada del alcance del bloque) ─────────
@@ -329,10 +409,15 @@ return {
       symbol = "│",
       draw = {
         delay = 100,
-        animation = function() return 20 end,
+        animation = function()
+          return 20
+        end,
       },
       options = { try_as_border = false },
     },
+    config = function(_, opts)
+      require("mini.indentscope").setup(opts)
+    end,
   },
 
   -- ── Flash: salto rápido con s/S (no sobrescribe r/R) ──────────────────────
@@ -340,13 +425,428 @@ return {
     "folke/flash.nvim",
     event = "VeryLazy",
     keys = {
-      { "s", function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash jump" },
-      { "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "Flash treesitter" },
+      {
+        "s",
+        function()
+          require("flash").jump()
+        end,
+        mode = { "n", "x", "o" },
+        desc = "Flash jump",
+      },
+      {
+        "S",
+        function()
+          require("flash").treesitter()
+        end,
+        mode = { "n", "x", "o" },
+        desc = "Flash treesitter",
+      },
     },
     opts = {
       modes = {
         char = { enabled = false },
       },
     },
+    config = function(_, opts)
+      require("flash").setup(opts)
+    end,
+  },
+
+  -- ── Test runner inline (Go: go test, etc.) ──────────────────────────────
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      {
+        "nvim-neotest/neotest-go",
+        ft = "go",
+      },
+    },
+    keys = {
+      {
+        "<leader>tn",
+        function()
+          require("neotest").run.run()
+        end,
+        desc = "Run nearest test",
+      },
+      {
+        "<leader>tf",
+        function()
+          require("neotest").run.run(vim.fn.expand "%")
+        end,
+        desc = "Run test file",
+      },
+      {
+        "<leader>ts",
+        function()
+          require("neotest").run.run { suite = true }
+        end,
+        desc = "Run test suite",
+      },
+      {
+        "<leader>tl",
+        function()
+          require("neotest").run.run_last()
+        end,
+        desc = "Run last test",
+      },
+      {
+        "<leader>to",
+        function()
+          require("neotest").output.open()
+        end,
+        desc = "Show test output",
+      },
+      {
+        "<leader>tX",
+        function()
+          require("neotest").run.stop()
+        end,
+        desc = "Stop tests",
+      },
+      {
+        "<leader>tw",
+        function()
+          require("neotest").summary.toggle()
+        end,
+        desc = "Toggle test summary",
+      },
+    },
+    config = function()
+      require("neotest").setup {
+        adapters = {
+          require "neotest-go",
+        },
+      }
+    end,
+  },
+
+  -- ── npm package versions in package.json ────────────────────────────────
+  {
+    "vuki656/package-info.nvim",
+    ft = "json",
+    opts = {},
+    config = function(_, opts)
+      require("package-info").setup(opts)
+    end,
+  },
+
+  -- ── Task runner: go build, npm run dev, docker compose... ────────────────
+  {
+    "stevearc/overseer.nvim",
+    cmd = { "OverseerRun", "OverseerToggle", "OverseerBuild" },
+    keys = {
+      { "<leader>or", "<cmd>OverseerRun<cr>", desc = "Run task" },
+      { "<leader>ot", "<cmd>OverseerToggle<cr>", desc = "Toggle task list" },
+      { "<leader>ow", "<cmd>OverseerWatch<cr>", desc = "Watch task output" },
+    },
+    opts = {
+      strategy = "toggleterm",
+    },
+    config = function(_, opts)
+      require("overseer").setup(opts)
+    end,
+  },
+
+  -- ── NvChad overrides (explicit config to bypass lazy auto-detection) ──
+  {
+    "nvim-tree/nvim-web-devicons",
+    config = function(_, opts)
+      require("nvim-web-devicons").setup(opts)
+    end,
+  },
+  {
+    "folke/which-key.nvim",
+    config = function(_, opts)
+      require("which-key").setup(opts)
+    end,
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    config = function(_, opts)
+      require("gitsigns").setup(opts)
+    end,
+  },
+  {
+    "mason-org/mason.nvim",
+    config = function(_, opts)
+      require("mason").setup(opts)
+    end,
+  },
+
+  -- ── UI: cmdline flotante, mensajes modernos, LSP progress ───────────────────
+  {
+    "rcarriga/nvim-notify",
+    event = "VeryLazy",
+    opts = {
+      timeout = 3000,
+      max_height = function()
+        return math.floor(vim.o.lines * 0.5)
+      end,
+      max_width = function()
+        return math.floor(vim.o.columns * 0.5)
+      end,
+      top_down = false,
+      stages = "fade",
+    },
+    config = function(_, opts)
+      require("notify").setup(opts)
+    end,
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    opts = {
+      lsp = {
+        progress = { enabled = true },
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+        },
+      },
+      presets = {
+        bottom_search = false,
+        command_palette = false,
+        long_message_to_split = true,
+      },
+      routes = {
+        { filter = { event = "msg_showmode" }, opts = { skip = true } },
+      },
+    },
+    config = function(_, opts)
+      require("noice").setup(opts)
+    end,
+  },
+
+  -- ── TODO / FIXME / HACK highlighting + Telescope search ─────────────────────
+  {
+    "folke/todo-comments.nvim",
+    event = "BufReadPost",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      signs = true,
+      signs_priority = 8,
+      keywords = {
+        FIX = { icon = "\u{eaaf}", color = "error", alt = { "FIXME", "BUG", "FIXIT", "ISSUE" } },
+        TODO = { icon = "\u{f300}", color = "info" },
+        HACK = { icon = "\u{f490}", color = "warning" },
+        WARN = { icon = "\u{ea2c}", color = "warning", alt = { "WARNING", "XXX" } },
+        PERF = { icon = "\u{f43a}", color = "default", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+        NOTE = { icon = "\u{ea34}", color = "hint", alt = { "INFO" } },
+        TEST = { icon = "\u{23f2}", color = "error", alt = { "TESTING", "PASSED", "FAILED" } },
+      },
+      gui_style = { fg = "NONE", bg = "NONE", bold = true },
+      merge_keywords = true,
+      highlight = { multiline = true, multiline_pattern = "^.", multiline_context = 10 },
+      search = { command = "rg", pattern = [[\b(KEYWORDS):]] },
+    },
+    config = function(_, opts)
+      require("todo-comments").setup(opts)
+    end,
+  },
+
+  -- ── Animaciones rápidas (scroll DESACTIVADO: se atasca con mouse) ─────────
+  {
+    "echasnovski/mini.animate",
+    event = "VeryLazy",
+    config = function()
+      local animate = require("mini.animate")
+      animate.setup({
+        cursor = {
+          enable = true,
+          timing = animate.gen_timing.linear({ duration = 20, unit = "total" }),
+        },
+        scroll = { enable = false },
+        resize = {
+          enable = true,
+          timing = animate.gen_timing.linear({ duration = 50, unit = "total" }),
+        },
+        open = {
+          enable = true,
+          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
+        },
+        close = {
+          enable = true,
+          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
+        },
+      })
+    end,
+  },
+
+  -- ── Scrollbar visual con marcas de git / diagnostics ───────────────────────
+  {
+    "petertriho/nvim-scrollbar",
+    event = "BufReadPost",
+    opts = {},
+    config = function(_, opts)
+      require("scrollbar").setup(opts)
+      require("scrollbar.handlers.gitsigns").setup()
+    end,
+  },
+
+  -- ── Semantic folding (treesitter + indent, sin LSP extra) ───────────────────
+  {
+    "kevinhwang91/nvim-ufo",
+    event = "BufReadPost",
+    dependencies = { "kevinhwang91/promise-async" },
+    opts = {
+      provider_selector = function()
+        return { "treesitter", "indent" }
+      end,
+    },
+    config = function(_, opts)
+      vim.o.foldcolumn = "0"
+      vim.o.foldlevel = 99
+      vim.o.foldlevelstart = 99
+      vim.o.foldenable = true
+      require("ufo").setup(opts)
+    end,
+  },
+
+  -- ── Symbol outline sidebar (treesitter + LSP) ──────────────────────────────
+  {
+    "stevearc/aerial.nvim",
+    cmd = { "AerialToggle", "AerialOpen", "AerialNavToggle" },
+    keys = {
+      { "<leader>oa", "<cmd>AerialToggle<cr>", desc = "Toggle symbol outline" },
+      { "<leader>oA", "<cmd>AerialNavToggle<cr>", desc = "Toggle outline nav" },
+    },
+    opts = {
+      backends = { "treesitter", "lsp", "markdown" },
+      layout = { min_width = 30, max_width = 50 },
+      show_guides = true,
+      guide_style = "stub",
+      close_behavior = "auto",
+      keymaps = {
+        ["<CR>"] = "actions.jump",
+        ["<C-s>"] = "actions.jump_vsplit",
+        ["<C-v>"] = "actions.jump_split",
+        ["q"] = "actions.close",
+      },
+    },
+    config = function(_, opts)
+      require("aerial").setup(opts)
+    end,
+  },
+
+  -- ── Rich Markdown rendering ──────────────────────────────────────────────────
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    ft = "markdown",
+    opts = {},
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+    end,
+  },
+
+  -- ── Harpoon: quick file marks ────────────────────────────────────────────────
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    keys = {
+      {
+        "<leader>ha",
+        function()
+          require("harpoon"):list():add()
+        end,
+        desc = "Add file to harpoon",
+      },
+      {
+        "<leader>hm",
+        function()
+          require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
+        end,
+        desc = "Harpoon menu",
+      },
+      {
+        "<A-1>",
+        function()
+          require("harpoon"):list():select(1)
+        end,
+        desc = "Harpoon file 1",
+      },
+      {
+        "<A-2>",
+        function()
+          require("harpoon"):list():select(2)
+        end,
+        desc = "Harpoon file 2",
+      },
+      {
+        "<A-3>",
+        function()
+          require("harpoon"):list():select(3)
+        end,
+        desc = "Harpoon file 3",
+      },
+      {
+        "<A-4>",
+        function()
+          require("harpoon"):list():select(4)
+        end,
+        desc = "Harpoon file 4",
+      },
+    },
+    config = function(_, opts)
+      require("harpoon").setup(opts)
+    end,
+  },
+
+  -- ── Project-local LSP config (.neoconf.json) ──────────────────────────────────
+  {
+    "folke/neoconf.nvim",
+    event = "BufReadPre",
+    opts = {},
+    config = function(_, opts)
+      require("neoconf").setup(opts)
+    end,
+  },
+
+  -- ── Clipboard history (Telescope) ──────────────────────────────────────────────
+  {
+    "AckslD/nvim-neoclip.lua",
+    keys = {
+      {
+        "<leader>fc",
+        function()
+          require("telescope").extensions.neoclip.default()
+        end,
+        desc = "Clipboard history",
+      },
+    },
+    dependencies = {
+      { "kkharji/sqlite.lua", module = "sqlite" },
+      { "nvim-telescope/telescope.nvim" },
+    },
+    opts = {
+      history = 1000,
+      enable_persistent_history = true,
+      length_limit = 1048576,
+      continuous_sync = true,
+      db_path = vim.fn.stdpath "data" .. "/neoclip/db.sqlite3",
+    },
+    config = function(_, opts)
+      require("neoclip").setup(opts)
+      require("telescope").load_extension "neoclip"
+    end,
+  },
+
+  -- ── Visual sorting ────────────────────────────────────────────────────────────
+  {
+    "sQVe/sort.nvim",
+    keys = {
+      { "<leader>qs", "<cmd>Sort<cr>", mode = "v", desc = "Sort selection" },
+    },
+    opts = {},
+    config = function(_, opts)
+      require("sort").setup(opts)
+    end,
   },
 }

@@ -41,6 +41,13 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 | `sr` | Replace surrounding delimiter |
 | `s` | Flash jump to word |
 | `S` | Flash jump via treesitter (classes, functions) |
+| `<leader>tn` | Run nearest test (neotest) |
+| `<leader>tf` | Run current test file |
+| `<leader>ts` | Run test suite |
+| `<leader>tl` | Run last test |
+| `<leader>to` | Show test output |
+| `<leader>or` | Run task (overseer) |
+| `<leader>ot` | Toggle task list |
 | `;` | Command mode |
 | `jk` | Escape (insert mode) |
 | `<C-LeftMouse>` | Go to definition |
