@@ -36,6 +36,11 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 | `<leader>du` | Toggle DAP UI |
 | `<leader>xx` | Diagnostics (Trouble) |
 | `<leader>xb` | Buffer diagnostics |
+| `sa` | Add surrounding delimiter (visual/normal) |
+| `sd` | Delete surrounding delimiter |
+| `sr` | Replace surrounding delimiter |
+| `s` | Flash jump to word |
+| `S` | Flash jump via treesitter (classes, functions) |
 | `;` | Command mode |
 | `jk` | Escape (insert mode) |
 | `<C-LeftMouse>` | Go to definition |

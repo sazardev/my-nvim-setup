@@ -265,4 +265,88 @@ return {
       enabled = false,
     },
   },
+
+  -- ── Treesitter context (función/clase actual al hacer scroll) ───────────
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    event = "BufReadPost",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      max_lines = 2,
+      trim_scope = "outer",
+      mode = "cursor",
+      separator = "─",
+    },
+  },
+
+  -- ── Surround: añadir/quitar/cambiar delimitadores ────────────────────────
+  {
+    "echasnovski/mini.surround",
+    keys = {
+      { "sa",  mode = { "n", "x" }, desc = "Add surrounding" },
+      { "sd",  mode = "n", desc = "Delete surrounding" },
+      { "sr",  mode = "n", desc = "Replace surrounding" },
+      { "sh",  mode = "n", desc = "Highlight surrounding" },
+      { "sF",  mode = "n", desc = "Find right surrounding" },
+      { "sf",  mode = "n", desc = "Find left surrounding" },
+      { "sn",  mode = "n", desc = "Update n_lines" },
+    },
+    opts = {
+      mappings = {
+        add = "sa",
+        delete = "sd",
+        find = "sf",
+        find_left = "sF",
+        highlight = "sh",
+        replace = "sr",
+        update_n_lines = "sn",
+      },
+    },
+  },
+
+  -- ── UI pulida para vim.ui.select/input (LSP rename, code actions) ────────
+  {
+    "stevearc/dressing.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- ── Highlight word under cursor (ilumina todas las ocurrencias) ──────────
+  {
+    "RRethy/vim-illuminate",
+    event = { "CursorHold", "CursorHoldI" },
+    opts = {
+      delay = 200,
+      filetypes_denylist = { "NvimTree", "TelescopePrompt", "alpha", "dashboard", "lazy", "mason", "nvdash" },
+    },
+  },
+
+  -- ── Indent scope indicator (línea animada del alcance del bloque) ─────────
+  {
+    "echasnovski/mini.indentscope",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+      symbol = "│",
+      draw = {
+        delay = 100,
+        animation = function() return 20 end,
+      },
+      options = { try_as_border = false },
+    },
+  },
+
+  -- ── Flash: salto rápido con s/S (no sobrescribe r/R) ──────────────────────
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    keys = {
+      { "s", function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash jump" },
+      { "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "Flash treesitter" },
+    },
+    opts = {
+      modes = {
+        char = { enabled = false },
+      },
+    },
+  },
 }

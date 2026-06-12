@@ -27,7 +27,7 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 | Linters | golangci-lint, eslint_d, markdownlint, jsonlint, ysc (YarnSpinner) |
 | Debug | nvim-dap, nvim-dap-go, nvim-dap-ui |
 | Terminal | toggleterm, lazygit, lazydocker (via TermExec) |
-| Other | Telescope, nvim-tree, Copilot+cmp, Trouble, fidget, autotag, rest.nvim, git-blame |
+| Other | Telescope, nvim-tree, Copilot+cmp, Trouble, fidget, autotag, rest.nvim, git-blame, treesitter-context, mini.surround, dressing, vim-illuminate, mini.indentscope, flash.nvim |
 
 ## Performance
 
@@ -47,4 +47,6 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 - `.claude/settings.local.json` is NOT committed (machine-specific permissions)
 - **Astro formatting** requires `prettier-plugin-astro` in the project's `node_modules` or installed globally — Mason only installs `prettier` itself
 - **rest.nvim** uses `.http` files — write requests and run them inline (httpie alternative inside Neovim)
+- **mini.surround** keymaps: `sa` add, `sd` delete, `sr` replace surrounding delimiters
+- **flash.nvim** keymaps: `s` jump to any word label, `S` jump to treesitter nodes (preserves native `r` replace char)
 - **Auto-reload limitation**: `luafile $MYVIMRC` reloads Lua config but does NOT install/remove plugins or treesitter parsers. For plugin changes, use `:Lazy sync` or restart nvim.
