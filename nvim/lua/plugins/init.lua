@@ -838,6 +838,43 @@ return {
     end,
   },
 
+  -- ── Session persistence (guardar/restaurar sesión por proyecto) ────────────────
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    keys = {
+      {
+        "<leader>qs",
+        function()
+          require("persistence").load()
+        end,
+        desc = "Restore last session",
+      },
+      {
+        "<leader>qS",
+        function()
+          require("persistence").save()
+        end,
+        desc = "Save current session",
+      },
+      {
+        "<leader>qd",
+        function()
+          require("persistence").stop()
+        end,
+        desc = "Don't save current session",
+      },
+    },
+    opts = {
+      dir = vim.fn.stdpath("state") .. "/sessions/",
+      need = 1,
+      branch = true,
+    },
+    config = function(_, opts)
+      require("persistence").setup(opts)
+    end,
+  },
+
   -- ── Visual sorting ────────────────────────────────────────────────────────────
   {
     "sQVe/sort.nvim",
