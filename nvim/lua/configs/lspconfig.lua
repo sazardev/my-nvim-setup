@@ -88,3 +88,9 @@ vim.lsp.config("jsonls", {
   end,
 })
 vim.lsp.enable "jsonls"
+
+-- ── Astro ────────────────────────────────────────────────────────────────────
+vim.lsp.config("astro", {
+  filetypes = { "astro" },
+})
+vim.lsp.enable "astro"

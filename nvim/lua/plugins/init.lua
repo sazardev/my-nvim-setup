@@ -26,6 +26,8 @@ return {
         "go", "gomod", "gosum", "gowork",
         "json", "yaml", "toml", "markdown",
         "dart",
+        -- Astro
+        "astro",
       },
     },
     init = function()
@@ -133,6 +135,8 @@ return {
         -- ESLint LSP (code actions) + JSON LSP (schema validation)
         "eslint-lsp",
         "json-lsp",
+        -- Astro
+        "astro-language-server",
       },
       auto_update = false,
       run_on_start = true,
@@ -212,5 +216,48 @@ return {
       })
       return opts
     end,
+  },
+
+  -- ── Terminal (lazygit, lazydocker, etc.) ───────────────────────────────────
+  {
+    "akinsho/toggleterm.nvim",
+    cmd = { "ToggleTerm", "TermExec" },
+    keys = {
+      { "<leader>tt", function() require("toggleterm").toggle() end, desc = "Toggle float terminal" },
+    },
+    opts = {
+      size = 0.6,
+      open_mapping = false,
+      direction = "float",
+    },
+  },
+
+  -- ── lazygit integration ────────────────────────────────────────────────────
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = "LazyGit",
+    keys = {
+      { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open lazygit" },
+      { "<leader>gd", "<cmd>TermExec cmd=lazydocker<cr>", desc = "Open lazydocker" },
+    },
+    dependencies = { "akinsho/toggleterm.nvim" },
+  },
+
+  -- ── HTTP requests (httpie alternativa) ─────────────────────────────────────
+  {
+    "rest-nvim/rest.nvim",
+    ft = "http",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+  },
+
+  -- ── Git blame inline ─────────────────────────────────────────────────────
+  {
+    "f-person/git-blame.nvim",
+    event = "BufRead",
+    opts = {
+      date_format = "%Y-%m-%d %H:%M",
+      virtual_text_column = 80,
+    },
   },
 }

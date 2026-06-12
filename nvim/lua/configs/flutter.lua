@@ -2,10 +2,11 @@
 -- Docs: https://github.com/akinsho/flutter-tools.nvim
 
 -- Capabilities: usar las de nvim-cmp si están disponibles
+local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 local capabilities = vim.tbl_deep_extend(
   "force",
   vim.lsp.protocol.make_client_capabilities(),
-  pcall(require, "cmp_nvim_lsp") and require("cmp_nvim_lsp").default_capabilities() or {}
+  has_cmp and cmp_nvim_lsp.default_capabilities() or {}
 )
 
 require("flutter-tools").setup {

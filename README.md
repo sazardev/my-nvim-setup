@@ -18,9 +18,23 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 
 ## What's included
 
-- **LSP**: gopls, vtsls, tailwindcss, eslint, jsonls (with SchemaStore), prismals, dockerls, html, cssls, emmet_ls
+- **LSP**: gopls, vtsls, tailwindcss, eslint, jsonls (with SchemaStore), prismals, dockerls, astro, html, cssls, emmet_ls
 - **Formatters**: stylua, goimports+gofumpt, prettier, dart_format, markdownlint-cli2
 - **Linters**: golangci-lint, eslint_d, markdownlint, jsonlint, ysc (YarnSpinner)
 - **Debugging**: nvim-dap + nvim-dap-go + nvim-dap-ui
-- **Tools**: Telescope, nvim-tree, Trouble, fidget, Copilot (via cmp), autotag, mason-tool-installer
+- **Tools**: Telescope, nvim-tree, Trouble, fidget, Copilot (via cmp), autotag, toggleterm, lazygit, rest.nvim, git-blame, mason-tool-installer
 - **Custom**: YarnSpinner syntax highlighting + ftdetect, project-local `.nvim.lua` support (`exrc`)
+
+## Keymaps
+
+| Key | Action |
+|-----|--------|
+| `<leader>tt` | Toggle float terminal |
+| `<leader>gg` | Open lazygit |
+| `<leader>gd` | Open lazydocker |
+| `<leader>du` | Toggle DAP UI |
+| `<leader>xx` | Diagnostics (Trouble) |
+| `<leader>xb` | Buffer diagnostics |
+| `;` | Command mode |
+| `jk` | Escape (insert mode) |
+| `<C-LeftMouse>` | Go to definition |

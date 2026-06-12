@@ -19,6 +19,8 @@ local options = {
     toml            = { "prettier" },
     -- Dart
     dart            = { "dart_format" },
+    -- Astro (requiere prettier-plugin-astro en node_modules del proyecto)
+    astro           = { "prettier" },
     -- Prisma (schemas multitenancy)
     prisma          = { "prisma" },
   },

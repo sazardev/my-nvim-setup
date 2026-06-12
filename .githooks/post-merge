@@ -1,0 +1,5 @@
+#!/bin/sh
+# Auto-reload hook: marca que la config fue actualizada
+# para que Neovim la recargue en el próximo UIEnter
+MARKER="$HOME/AppData/Local/nvim-data/.config-reloaded"
+touch "$MARKER"
