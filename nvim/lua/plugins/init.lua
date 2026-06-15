@@ -146,7 +146,46 @@ return {
     },
     dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
     config = function()
-      require("dapui").setup()
+      require("dapui").setup({
+        icons = {
+          expanded = " ",
+          collapsed = " ",
+          current_frame = "*",
+        },
+        mappings = {
+          expand = { "<CR>", "<2-LeftMouse>" },
+          open = "o",
+          remove = "d",
+          edit = "e",
+          repl = "r",
+          toggle = "t",
+        },
+        layouts = {
+          {
+            elements = {
+              { id = "scopes", size = 0.25 },
+              { id = "breakpoints", size = 0.25 },
+              { id = "stacks", size = 0.25 },
+              { id = "watches", size = 0.25 },
+            },
+            size = 40,
+            position = "left",
+          },
+          {
+            elements = {
+              { id = "repl", size = 0.5 },
+              { id = "console", size = 0.5 },
+            },
+            size = 0.25,
+            position = "bottom",
+          },
+        },
+        floating = {
+          border = "single",
+          mappings = { close = { "q", "<Esc>" } },
+        },
+        windows = { indent = 1 },
+      })
     end,
   },
 
@@ -220,7 +259,7 @@ return {
     end,
   },
 
-  -- ── Telescope: respeta .gitignore (rápido), muestra dotfiles ─────────────
+  -- ── Telescope: respeta .gitignore, sin íconos en resultados ───────────────
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
@@ -231,9 +270,19 @@ return {
       },
     },
     opts = {
+      defaults = {
+        path_display = { "truncate" },
+        prompt_prefix = " ",
+        selection_caret = " ",
+        layout_config = {
+          width = 0.9,
+          height = 0.9,
+        },
+      },
       pickers = {
         find_files = {
           hidden = true,
+          entry_maker = require("configs.telescope").no_icons(),
           find_command = {
             "rg", "--files", "--hidden", "--no-ignore",
             "--glob", "!.git",
@@ -248,6 +297,12 @@ return {
             "--glob", "!coverage",
           },
         },
+        buffers = {
+          entry_maker = require("configs.telescope").no_icons(),
+        },
+        oldfiles = {
+          entry_maker = require("configs.telescope").no_icons(),
+        },
       },
     },
     config = function(_, opts)
@@ -255,7 +310,7 @@ return {
     end,
   },
 
-  -- ── nvim-tree: oculta git-ignored (rápido), muestra dotfiles ──────────────
+  -- ── nvim-tree: oculta git-ignored (rápido), muestra dotfiles, sin íconos ──
   {
     "nvim-tree/nvim-tree.lua",
     opts = {
@@ -265,6 +320,26 @@ return {
       filters = {
         dotfiles = false,
         git_ignored = true,
+      },
+      view = {
+        icons = {
+          show = {
+            file = false,
+            folder = false,
+            folder_arrow = false,
+            git = false,
+          },
+        },
+      },
+      renderer = {
+        icons = {
+          show = {
+            file = false,
+            folder = false,
+            folder_arrow = false,
+            git = false,
+          },
+        },
       },
     },
     config = function(_, opts)
@@ -566,6 +641,14 @@ return {
   },
   {
     "lewis6991/gitsigns.nvim",
+    opts = {
+      signs = false,        -- sin +/- en signcolumn
+      numhl = true,         -- número de línea cambia de color (gruvbox)
+      linehl = false,       -- sin highlight en la línea entera
+      wordhl = false,       -- sin highlight de palabras cambiadas
+      current_line_blame = false,
+      update_defer = 100,   -- debounce = menos redraws
+    },
     config = function(_, opts)
       require("gitsigns").setup(opts)
     end,
@@ -636,9 +719,19 @@ return {
     opts = {
       backends = { "treesitter", "lsp", "markdown" },
       layout = { min_width = 30, max_width = 50 },
-      show_guides = true,
+      show_guides = false,           -- sin líneas verticales
       guide_style = "stub",
       close_behavior = "auto",
+      -- Kinds vacíos: íconos de Function/Class/etc. son string vacío
+      kinds = {
+        File = "", Module = "", Namespace = "", Package = "",
+        Class = "", Method = "", Property = "", Field = "",
+        Constructor = "", Enum = "", Interface = "", Function = "",
+        Variable = "", Constant = "", String = "", Number = "",
+        Boolean = "", Array = "", Object = "", Key = "", Null = "",
+        EnumMember = "", Struct = "", Event = "", Operator = "",
+        TypeParameter = "",
+      },
       keymaps = {
         ["<CR>"] = "actions.jump",
         ["<C-s>"] = "actions.jump_vsplit",
