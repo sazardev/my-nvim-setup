@@ -559,10 +559,6 @@ return {
 
   -- ── NvChad overrides (explicit config to bypass lazy auto-detection) ──
   {
-    "nvim-tree/nvim-web-devicons",
-    enabled = false,
-  },
-  {
     "folke/which-key.nvim",
     config = function(_, opts)
       require("which-key").setup(opts)
