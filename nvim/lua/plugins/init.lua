@@ -56,6 +56,36 @@ return {
       require("nvim-treesitter.install").compilers = { "gcc" }
     end,
   },
+  -- ── Treesitter textobjects (saltar entre funciones, clases, etc.) ─────────
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "BufReadPost",
+    opts = {
+      select = {
+        enable = true,
+        lookahead = true,
+        keymaps = {
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner",
+        },
+      },
+      move = {
+        enable = true,
+        set_jumps = true,
+        goto_next_start = {
+          ["]f"] = "@function.outer",
+          ["]c"] = "@class.outer",
+        },
+        goto_previous_start = {
+          ["[f"] = "@function.outer",
+          ["[c"] = "@class.outer",
+        },
+      },
+    },
+  },
 
   -- ── Linting ───────────────────────────────────────────────────────────────
   {
@@ -134,8 +164,6 @@ return {
     end,
   },
 
-  -- LSP progress → replaced by noice.nvim (loaded below)
-
   -- ── Mason: auto-instalar todos los tools ─────────────────────────────────
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -206,6 +234,19 @@ return {
       pickers = {
         find_files = {
           hidden = true,
+          find_command = {
+            "rg", "--files", "--hidden", "--no-ignore",
+            "--glob", "!.git",
+            "--glob", "!node_modules",
+            "--glob", "!.next",
+            "--glob", "!dist",
+            "--glob", "!build",
+            "--glob", "!vendor",
+            "--glob", "!target",
+            "--glob", "!.cache",
+            "--glob", "!.nuxt",
+            "--glob", "!coverage",
+          },
         },
       },
     },
@@ -334,22 +375,6 @@ return {
     end,
   },
 
-  -- ── Treesitter context (función/clase actual al hacer scroll) ───────────
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    event = "BufReadPost",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    opts = {
-      max_lines = 2,
-      trim_scope = "outer",
-      mode = "cursor",
-      separator = "─",
-    },
-    config = function(_, opts)
-      require("treesitter-context").setup(opts)
-    end,
-  },
-
   -- ── Surround: añadir/quitar/cambiar delimitadores ────────────────────────
   {
     "echasnovski/mini.surround",
@@ -398,25 +423,6 @@ return {
     },
     config = function(_, opts)
       require("illuminate").configure(opts)
-    end,
-  },
-
-  -- ── Indent scope indicator (línea animada del alcance del bloque) ─────────
-  {
-    "echasnovski/mini.indentscope",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      symbol = "│",
-      draw = {
-        delay = 100,
-        animation = function()
-          return 20
-        end,
-      },
-      options = { try_as_border = false },
-    },
-    config = function(_, opts)
-      require("mini.indentscope").setup(opts)
     end,
   },
 
@@ -554,9 +560,7 @@ return {
   -- ── NvChad overrides (explicit config to bypass lazy auto-detection) ──
   {
     "nvim-tree/nvim-web-devicons",
-    config = function(_, opts)
-      require("nvim-web-devicons").setup(opts)
-    end,
+    enabled = false,
   },
   {
     "folke/which-key.nvim",
@@ -577,54 +581,6 @@ return {
     end,
   },
 
-  -- ── UI: cmdline flotante, mensajes modernos, LSP progress ───────────────────
-  {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    opts = {
-      timeout = 3000,
-      max_height = function()
-        return math.floor(vim.o.lines * 0.5)
-      end,
-      max_width = function()
-        return math.floor(vim.o.columns * 0.5)
-      end,
-      top_down = false,
-      stages = "fade",
-    },
-    config = function(_, opts)
-      require("notify").setup(opts)
-    end,
-  },
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
-    },
-    opts = {
-      lsp = {
-        progress = { enabled = true },
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-        },
-      },
-      presets = {
-        bottom_search = false,
-        command_palette = false,
-        long_message_to_split = true,
-      },
-      routes = {
-        { filter = { event = "msg_showmode" }, opts = { skip = true } },
-      },
-    },
-    config = function(_, opts)
-      require("noice").setup(opts)
-    end,
-  },
-
   -- ── TODO / FIXME / HACK highlighting + Telescope search ─────────────────────
   {
     "folke/todo-comments.nvim",
@@ -634,13 +590,13 @@ return {
       signs = true,
       signs_priority = 8,
       keywords = {
-        FIX = { icon = "\u{eaaf}", color = "error", alt = { "FIXME", "BUG", "FIXIT", "ISSUE" } },
-        TODO = { icon = "\u{f300}", color = "info" },
-        HACK = { icon = "\u{f490}", color = "warning" },
-        WARN = { icon = "\u{ea2c}", color = "warning", alt = { "WARNING", "XXX" } },
-        PERF = { icon = "\u{f43a}", color = "default", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-        NOTE = { icon = "\u{ea34}", color = "hint", alt = { "INFO" } },
-        TEST = { icon = "\u{23f2}", color = "error", alt = { "TESTING", "PASSED", "FAILED" } },
+        FIX = { icon = "!", color = "error", alt = { "FIXME", "BUG", "FIXIT", "ISSUE" } },
+        TODO = { icon = "T", color = "info" },
+        HACK = { icon = "H", color = "warning" },
+        WARN = { icon = "W", color = "warning", alt = { "WARNING", "XXX" } },
+        PERF = { icon = "P", color = "default", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+        NOTE = { icon = "N", color = "hint", alt = { "INFO" } },
+        TEST = { icon = "X", color = "error", alt = { "TESTING", "PASSED", "FAILED" } },
       },
       gui_style = { fg = "NONE", bg = "NONE", bold = true },
       merge_keywords = true,
@@ -652,44 +608,7 @@ return {
     end,
   },
 
-  -- ── Animaciones rápidas (scroll DESACTIVADO: se atasca con mouse) ─────────
-  {
-    "echasnovski/mini.animate",
-    event = "VeryLazy",
-    config = function()
-      local animate = require("mini.animate")
-      animate.setup({
-        cursor = {
-          enable = true,
-          timing = animate.gen_timing.linear({ duration = 20, unit = "total" }),
-        },
-        scroll = { enable = false },
-        resize = {
-          enable = true,
-          timing = animate.gen_timing.linear({ duration = 50, unit = "total" }),
-        },
-        open = {
-          enable = true,
-          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
-        },
-        close = {
-          enable = true,
-          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
-        },
-      })
-    end,
-  },
 
-  -- ── Scrollbar visual con marcas de git / diagnostics ───────────────────────
-  {
-    "petertriho/nvim-scrollbar",
-    event = "BufReadPost",
-    opts = {},
-    config = function(_, opts)
-      require("scrollbar").setup(opts)
-      require("scrollbar.handlers.gitsigns").setup()
-    end,
-  },
 
   -- ── Semantic folding (treesitter + indent, sin LSP extra) ───────────────────
   {

@@ -69,12 +69,11 @@ M.nvdash = {
 }
 M.ui = {
   statusline = {
-    separator_style = "round",
+    separator_style = "default",
     order = { "mode", "file", "git", "%=", "diagnostics", "lsp", "cwd", "cursor" },
   },
   tabufline = {
-    lazyload = false,
-    position = "top",
+    enabled = false,
   },
 }
 
