@@ -321,16 +321,6 @@ return {
         dotfiles = false,
         git_ignored = true,
       },
-      view = {
-        icons = {
-          show = {
-            file = false,
-            folder = false,
-            folder_arrow = false,
-            git = false,
-          },
-        },
-      },
       renderer = {
         icons = {
           show = {
@@ -642,12 +632,11 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     opts = {
-      signs = false,        -- sin +/- en signcolumn
+      signcolumn = false,   -- sin signs en signcolumn
       numhl = true,         -- número de línea cambia de color (gruvbox)
       linehl = false,       -- sin highlight en la línea entera
-      wordhl = false,       -- sin highlight de palabras cambiadas
       current_line_blame = false,
-      update_defer = 100,   -- debounce = menos redraws
+      update_debounce = 100, -- debounce = menos redraws
     },
     config = function(_, opts)
       require("gitsigns").setup(opts)
