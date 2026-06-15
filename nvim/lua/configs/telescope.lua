@@ -15,10 +15,11 @@ function M.no_icons()
     },
   })
 
-  return function(entry)
-    local path = entry.path or entry.value
+  return function(line)
+    -- line es el string crudo que viene de rg (ej: "src/foo.go")
+    local path = line
     return {
-      value = entry,
+      value = path,
       path = path,
       ordinal = path,
       display = function(e)

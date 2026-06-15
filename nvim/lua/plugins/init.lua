@@ -331,6 +331,25 @@ return {
           },
         },
       },
+      on_attach = function(bufnr)
+        local api = require "nvim-tree.api"
+        local function map(mode, lhs, rhs, desc)
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = "nvim-tree: " .. desc, nowait = true })
+        end
+
+        api.config.mappings.default_on_attach(bufnr)
+
+        -- <CR> sobre un archivo → abre y cierra nvim-tree
+        map("n", "<CR>", function()
+          local node = api.tree.get_node_under_cursor()
+          if node.nodes then
+            api.node.open.edit()
+          else
+            api.node.open.edit()
+            api.tree.close()
+          end
+        end, "Open file and close tree")
+      end,
     },
     config = function(_, opts)
       require("nvim-tree").setup(opts)
