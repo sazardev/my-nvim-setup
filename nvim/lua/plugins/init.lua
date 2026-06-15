@@ -902,4 +902,136 @@ return {
       require("sort").setup(opts)
     end,
   },
+
+  -- ── lualine.nvim (reemplaza el statusline custom de NvChad) ──────────────────
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    opts = {
+      options = {
+        -- theme se resuelve en config() leyendo base46 de NvChad,
+        -- así cambia si el usuario usa theme_toggle (gruvbox <-> gruvbox_light)
+        theme = "auto",
+        section_separators = "",
+        component_separators = "",
+        globalstatus = true,
+        refresh = {
+          statusline = 200,
+          winbar = 200,
+          tabline = 200,
+          underline = 1000,
+        },
+      },
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "filename" },
+        lualine_c = { { "branch", icon = "" } },
+        lualine_x = {
+          {
+            "diagnostics",
+            sources = { "nvim_diagnostic" },
+            symbols = { error = "E", warn = "W" },
+            diagnostics_color = {
+              error = "DiagnosticError",
+              warn = "DiagnosticWarn",
+            },
+            colored = false,
+            sections = { "error", "warn" },
+          },
+        },
+        lualine_y = {
+          {
+            function()
+              local clients = vim.lsp.get_clients({ bufnr = 0 })
+              if #clients == 0 then return "" end
+              return table.concat(
+                vim.tbl_map(function(c) return c.name end, clients),
+                " "
+              )
+            end,
+            cond = function() return #vim.lsp.get_clients({ bufnr = 0 }) > 0 end,
+          },
+          {
+            function()
+              local name = vim.uv.cwd()
+              return name:match("([^/\\]+)[/\\]*$") or name
+            end,
+            cond = function() return vim.o.columns > 85 end,
+          },
+        },
+        lualine_z = { "location" },
+      },
+      inactive_sections = {
+        lualine_a = {},
+        lualine_b = { "filename" },
+        lualine_c = {},
+        lualine_x = { "filetype" },
+        lualine_y = {},
+        lualine_z = { "location" },
+      },
+    },
+    config = function(_, opts)
+      local function build_theme()
+        local ok, base46 = pcall(require, "base46")
+        if not ok then
+          return require("lualine.themes.gruvbox_dark")
+        end
+        local p30 = base46.get_theme_tb("base_30") or {}
+        local p16 = base46.get_theme_tb("base_16") or {}
+        local is_dark = base46.get_theme_tb("type") ~= "light"
+
+        local mode_fg = p16.base00 or "#282828"
+        local c_bg = is_dark and (p30.statusline_bg or "#2c2c2c") or (p16.base01 or "#3c3836")
+        local c_fg = p16.base04 or "#bdae93"
+        local b_bg = p30.lightbg or p16.base01 or "#3d3d3d"
+        local b_fg = p30.white or p16.base06 or "#ebdbb2"
+        local inactive_a = is_dark and (p30.one_bg2 or "#3f3f3f") or (p16.base02 or "#423e3c")
+
+        local modes = {
+          normal   = p30.nord_blue or "#83a598",
+          insert   = p30.green or "#b8bb26",
+          visual   = p30.sun or "#fabd2f",
+          replace  = p30.red or "#fb4934",
+          command  = p30.dark_purple or "#d3869b",
+          terminal = p30.orange or "#e78a4e",
+        }
+
+        local function section(m)
+          return {
+            a = { bg = modes[m], fg = mode_fg, gui = "bold" },
+            b = { bg = b_bg, fg = b_fg },
+            c = { bg = c_bg, fg = c_fg },
+          }
+        end
+
+        return {
+          normal   = section("normal"),
+          insert   = section("insert"),
+          visual   = section("visual"),
+          replace  = section("replace"),
+          command  = section("command"),
+          terminal = section("terminal"),
+          inactive = {
+            a = { bg = inactive_a, fg = c_fg, gui = "bold" },
+            b = { bg = inactive_a, fg = c_fg },
+            c = { bg = c_bg, fg = c_fg },
+          },
+        }
+      end
+
+      opts.options.theme = build_theme()
+      require("lualine").setup(opts)
+
+      -- Re-aplica el theme si NvChad recarga colores (p.ej. theme_toggle)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("LualineNvChadTheme", { clear = true }),
+        callback = function()
+          local ok, lualine = pcall(require, "lualine")
+          if ok then
+            lualine.setup({ options = { theme = build_theme() } })
+          end
+        end,
+      })
+    end,
+  },
 }
