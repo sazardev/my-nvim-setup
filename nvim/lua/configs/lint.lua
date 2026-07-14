@@ -31,8 +31,18 @@ lint.linters_by_ft = {
   yarnspinner     = { "ysc" },   -- requiere: dotnet tool install -g yarn-spinner
 }
 
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   callback = function()
     lint.try_lint()
+  end,
+})
+
+-- InsertLeave: solo linters livianos. golangci-lint analiza todo el paquete
+-- y correrlo en cada salida de insert satura CPU en máquinas de bajos recursos.
+vim.api.nvim_create_autocmd("InsertLeave", {
+  callback = function()
+    if vim.bo.filetype ~= "go" then
+      lint.try_lint()
+    end
   end,
 })

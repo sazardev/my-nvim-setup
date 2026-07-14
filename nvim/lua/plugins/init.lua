@@ -32,7 +32,6 @@ return {
         "tsx",
         "prisma",
         "dockerfile",
-        "dotenv",
         "go",
         "gomod",
         "gosum",
@@ -49,7 +48,15 @@ return {
       },
     },
     config = function(_, opts)
-      require("nvim-treesitter").setup(opts)
+      -- La API nueva de nvim-treesitter (rama "main") ya NO instala sola los
+      -- parsers listados en ensure_installed dentro de .setup() (a diferencia
+      -- de la rama vieja) — hay que pedirlo explícito con .install(). Sin esto
+      -- nunca se compila ningún parser y el highlighter nunca tiene nada que
+      -- resaltar (aunque .setup() no tira error, queda en silencio). También
+      -- requiere el binario `tree-sitter` (paquete `tree-sitter-cli`) instalado
+      -- en el sistema, no solo un compilador de C.
+      require("nvim-treesitter").setup {}
+      require("nvim-treesitter").install(opts.ensure_installed)
     end,
     init = function()
       -- Forzar gcc en Windows (evita buscar cl.exe/MSVC)
@@ -212,6 +219,7 @@ return {
         -- Lua
         "stylua",
         -- Go
+        "gopls",
         "goimports",
         "gofumpt",
         "golangci-lint",

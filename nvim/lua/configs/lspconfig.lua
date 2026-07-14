@@ -10,6 +10,7 @@ vim.lsp.config("gopls", {
       gofumpt = true,
       staticcheck = true,
       usePlaceholders = true,
+      directoryFilters = { "-**/node_modules", "-**/vendor", "-**/.git" },
       analyses = {
         unusedparams = true,
         shadow = true,

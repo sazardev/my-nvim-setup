@@ -20,3 +20,13 @@ vim.api.nvim_create_autocmd("VimEnter", {
     vim.o.cmdheight = 0
   end,
 })
+
+-- Arrancar el highlighter de treesitter: la rama "main" de nvim-treesitter
+-- ya no lo hace sola (a diferencia de la vieja configs.setup{highlight=...}).
+-- Sin esto ningún capture "@function"/"@operator"/etc. se resalta nunca,
+-- aunque el parser esté instalado (queda solo la sintaxis regex de vim).
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf)
+  end,
+})

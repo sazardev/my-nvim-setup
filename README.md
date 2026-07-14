@@ -48,6 +48,12 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 | `<leader>to` | Show test output |
 | `<leader>or` | Run task (overseer) |
 | `<leader>ot` | Toggle task list |
+| `<leader>rr` | Go run (floating terminal, detects module vs standalone script) |
+| `<leader>rb` | Go build |
+| `<leader>rv` | Go vet / golangci-lint run |
+| `<leader>rx` | golangci-lint run --fix |
+| `<leader>rf` | Go format on demand (conform) |
+| `<leader>rd` | Go doc offline (cursor word, via go.nvim `:GoDoc`) |
 | `;` | Command mode |
 | `jk` | Escape (insert mode) |
 | `<C-LeftMouse>` | Go to definition |

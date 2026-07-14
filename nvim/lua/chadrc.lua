@@ -13,6 +13,22 @@ M.base46 = {
     Comment = { italic = true },
     ["@comment"] = { italic = true },
     St_gitIcons = { fg = "white", bg = "lightbg", bold = true },
+
+    -- Funciones: el tema base usaba base0D (el azul "nord" apagado del
+    -- gruvbox de NvChad) para nombres/llamadas de función. Lo cambiamos al
+    -- aqua vivo (base0C, ya usado en @constructor) + bold para que resalten.
+    Function = { fg = "base0C", bold = true },
+    ["@function"] = { fg = "base0C", bold = true },
+    ["@function.builtin"] = { fg = "base0C", bold = true },
+    ["@function.call"] = { fg = "base0C", bold = true },
+    ["@function.method"] = { fg = "base0C", bold = true },
+    ["@function.method.call"] = { fg = "base0C", bold = true },
+
+    -- Operadores (+, -, =, etc.): el tema (polish_hl en themes/gruvbox.lua)
+    -- los pintaba con el MISMO azul apagado que las funciones, quedando
+    -- planos. Les damos su propio tono cálido para que no se pierdan.
+    Operator = { fg = "orange" },
+    ["@operator"] = { fg = "orange" },
   },
 }
 

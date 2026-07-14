@@ -1,2 +1,5 @@
 # Machine-specific Claude config
 .claude/
+
+# Serena MCP tool cache/state (machine-specific)
+.serena/
