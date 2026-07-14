@@ -364,41 +364,10 @@ return {
     end,
   },
 
-  -- ── GitHub Copilot ────────────────────────────────────────────────────────
-  {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    opts = {
-      suggestion = { enabled = false }, -- usamos cmp, no ghost text
-      panel = { enabled = false },
-      filetypes = {
-        ["*"] = true, -- activar en todos los tipos de archivo
-      },
-    },
-    config = function(_, opts)
-      require("copilot").setup(opts)
-    end,
-  },
-  {
-    "zbirenbaum/copilot-cmp",
-    dependencies = { "zbirenbaum/copilot.lua" },
-    config = function()
-      require("copilot_cmp").setup()
-    end,
-  },
+  -- ── Autocompletar (sin Copilot) ────────────────────────────────────────────
   {
     "hrsh7th/nvim-cmp",
-    dependencies = { "zbirenbaum/copilot-cmp" },
-    opts = function(_, opts)
-      opts.sources = opts.sources or {}
-      table.insert(opts.sources, 1, {
-        name = "copilot",
-        group_index = 1,
-        priority = 100,
-      })
-      return opts
-    end,
+    opts = {},
     config = function(_, opts)
       require("cmp").setup(opts)
     end,
