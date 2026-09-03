@@ -46,7 +46,7 @@ o.cursorline    = true   -- sutil, ayuda en gruvbox
 o.cursorlineopt = "number" -- colorea solo el nº, menos redraw
 
 -- ── Sign column: solo aparece si hay un sign (todo-comments) ─────────────────
-o.signcolumn = "auto:1"
+o.signcolumn = "yes:1"
 
 -- maplocalleader = space (importante para LSP de buffer-local mappings)
 vim.g.maplocalleader = " "

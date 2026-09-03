@@ -155,8 +155,8 @@ return {
     config = function()
       require("dapui").setup({
         icons = {
-          expanded = " ",
-          collapsed = " ",
+          expanded = "+ ",
+          collapsed = "- ",
           current_frame = "*",
         },
         mappings = {
@@ -213,7 +213,8 @@ return {
   -- ── Mason: auto-instalar todos los tools ─────────────────────────────────
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    lazy = false,
+    dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
         -- Lua
@@ -228,6 +229,7 @@ return {
         "eslint_d",
         -- Markdown
         "markdownlint-cli2",
+        "markdownlint",
         -- Otros
         "jsonlint",
         -- Prisma (schemas multitenancy)
@@ -280,8 +282,8 @@ return {
     opts = {
       defaults = {
         path_display = { "truncate" },
-        prompt_prefix = " ",
-        selection_caret = " ",
+        prompt_prefix = "> ",
+        selection_caret = "  ",
         layout_config = {
           width = 0.9,
           height = 0.9,
@@ -322,11 +324,8 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     opts = {
-      git = {
-        ignore = true,
-      },
       filters = {
-        dotfiles = false,
+        dotfiles = true,
         git_ignored = true,
       },
       renderer = {
@@ -390,6 +389,7 @@ return {
       size = 0.6,
       open_mapping = false,
       direction = "float",
+      float_opts = { border = "single" },
     },
     config = function(_, opts)
       require("toggleterm").setup(opts)
@@ -468,7 +468,9 @@ return {
   {
     "stevearc/dressing.nvim",
     event = "VeryLazy",
-    opts = {},
+    opts = {
+      float = { border = "single" },
+    },
     config = function(_, opts)
       require("dressing").setup(opts)
     end,
@@ -912,7 +914,7 @@ return {
               error = "DiagnosticError",
               warn = "DiagnosticWarn",
             },
-            colored = false,
+            colored = true,
             sections = { "error", "warn" },
           },
         },

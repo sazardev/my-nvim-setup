@@ -12,7 +12,7 @@ local capabilities = vim.tbl_deep_extend(
 require("flutter-tools").setup {
   -- ── UI ──────────────────────────────────────────────────────────────────────
   ui = {
-    border = "rounded",
+    border = "single",
     notification_style = "native",
   },
 

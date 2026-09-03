@@ -188,7 +188,7 @@ map("n", "<leader>rd", function()
 
   local function show(lines)
     vim.lsp.util.open_floating_preview(go_doc_format(lines), "markdown", {
-      border = "rounded",
+      border = "single",
       focusable = true,
       close_events = { "CursorMoved", "CursorMovedI", "BufHidden", "InsertCharPre" },
       max_width = math.floor(vim.o.columns * 0.8),

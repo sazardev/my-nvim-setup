@@ -24,7 +24,7 @@ function M.no_icons()
       ordinal = path,
       display = function(e)
         return displayer({
-          { " " },
+          { "" },
           e.path,
         })
       end,
