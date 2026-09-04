@@ -84,11 +84,9 @@ return {
         set_jumps = true,
         goto_next_start = {
           ["]f"] = "@function.outer",
-          ["]c"] = "@class.outer",
         },
         goto_previous_start = {
           ["[f"] = "@function.outer",
-          ["[c"] = "@class.outer",
         },
       },
     },
@@ -120,81 +118,13 @@ return {
     ft = { "dart" },
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "mfussenegger/nvim-dap",
     },
     config = function()
       require "configs.flutter"
     end,
   },
 
-  -- ── Debugging ─────────────────────────────────────────────────────────────
-  {
-    "mfussenegger/nvim-dap",
-    lazy = true,
-  },
-  {
-    "leoluz/nvim-dap-go",
-    ft = "go",
-    dependencies = "mfussenegger/nvim-dap",
-    config = function()
-      require("dap-go").setup()
-    end,
-  },
-  {
-    "rcarriga/nvim-dap-ui",
-    keys = {
-      {
-        "<leader>du",
-        function()
-          require("dapui").toggle()
-        end,
-        desc = "Toggle DAP UI",
-      },
-    },
-    dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-    config = function()
-      require("dapui").setup({
-        icons = {
-          expanded = "+ ",
-          collapsed = "- ",
-          current_frame = "*",
-        },
-        mappings = {
-          expand = { "<CR>", "<2-LeftMouse>" },
-          open = "o",
-          remove = "d",
-          edit = "e",
-          repl = "r",
-          toggle = "t",
-        },
-        layouts = {
-          {
-            elements = {
-              { id = "scopes", size = 0.25 },
-              { id = "breakpoints", size = 0.25 },
-              { id = "stacks", size = 0.25 },
-              { id = "watches", size = 0.25 },
-            },
-            size = 40,
-            position = "left",
-          },
-          {
-            elements = {
-              { id = "repl", size = 0.5 },
-              { id = "console", size = 0.5 },
-            },
-            size = 0.25,
-            position = "bottom",
-          },
-        },
-        floating = {
-          border = "single",
-          mappings = { close = { "q", "<Esc>" } },
-        },
-        windows = { indent = 1 },
-      })
-    end,
-  },
+
 
   -- ── Diagnostics panel ─────────────────────────────────────────────────────
   {
@@ -202,7 +132,6 @@ return {
     cmd = "Trouble",
     keys = {
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
-      { "<leader>xb", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },
     },
     opts = {},
     config = function(_, opts)
@@ -237,8 +166,7 @@ return {
         -- Docker (Dockerfile + docker-compose.yml)
         "dockerfile-language-server",
         "docker-compose-language-service",
-        -- Dart / Flutter
-        "dart-debug-adapter",
+
         -- ESLint LSP (code actions) + JSON LSP (schema validation)
         "eslint-lsp",
         "json-lsp",
@@ -320,6 +248,23 @@ return {
     end,
   },
 
+  -- ── Reemplazo global estilo VS Code ───────────────────────────────────────
+  {
+    "MagicDuck/grug-far.nvim",
+    cmd = "GrugFar",
+    keys = {
+      { "<leader>fr", "<cmd>GrugFar<cr>", desc = "replace" },
+    },
+    opts = {
+      keymaps = {
+        close = { n = "q" },
+      },
+    },
+    config = function(_, opts)
+      require("grug-far").setup(opts)
+    end,
+  },
+
   -- ── nvim-tree: oculta git-ignored (rápido), muestra dotfiles, sin íconos ──
   {
     "nvim-tree/nvim-tree.lua",
@@ -372,27 +317,21 @@ return {
     end,
   },
 
-  -- ── Terminal (lazygit, lazydocker, etc.) ───────────────────────────────────
+  -- ── Terminal (lazygit, lazydocker, Go commands) ─────────────────────────────
   {
     "akinsho/toggleterm.nvim",
     cmd = { "ToggleTerm", "TermExec" },
-    keys = {
-      {
-        "<leader>tt",
-        function()
-          require("toggleterm").toggle()
-        end,
-        desc = "Toggle float terminal",
-      },
-    },
     opts = {
       size = 0.6,
       open_mapping = false,
       direction = "float",
       float_opts = { border = "single" },
+      close_on_exit = true,
     },
     config = function(_, opts)
       require("toggleterm").setup(opts)
+      -- Esc en terminal cierra la ventana flotante
+      vim.keymap.set("t", "<Esc>", "<cmd>lua require('toggleterm').toggle()<cr>", { desc = "Close terminal (Esc)" })
     end,
   },
 
@@ -402,7 +341,6 @@ return {
     cmd = "LazyGit",
     keys = {
       { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open lazygit" },
-      { "<leader>gd", "<cmd>TermExec cmd=lazydocker<cr>", desc = "Open lazydocker" },
     },
     dependencies = { "akinsho/toggleterm.nvim" },
   },
@@ -423,9 +361,6 @@ return {
   {
     "f-person/git-blame.nvim",
     cmd = "GitBlameToggle",
-    keys = {
-      { "<leader>gb", "<cmd>GitBlameToggle<cr>", desc = "Toggle git blame" },
-    },
     opts = {
       date_format = "%Y-%m-%d %H:%M",
       virtual_text_column = 80,
@@ -443,10 +378,6 @@ return {
       { "sa", mode = { "n", "x" }, desc = "Add surrounding" },
       { "sd", mode = "n", desc = "Delete surrounding" },
       { "sr", mode = "n", desc = "Replace surrounding" },
-      { "sh", mode = "n", desc = "Highlight surrounding" },
-      { "sF", mode = "n", desc = "Find right surrounding" },
-      { "sf", mode = "n", desc = "Find left surrounding" },
-      { "sn", mode = "n", desc = "Update n_lines" },
     },
     opts = {
       mappings = {
@@ -521,77 +452,7 @@ return {
     end,
   },
 
-  -- ── Test runner inline (Go: go test, etc.) ──────────────────────────────
-  {
-    "nvim-neotest/neotest",
-    dependencies = {
-      "nvim-neotest/nvim-nio",
-      "nvim-lua/plenary.nvim",
-      "antoinemadec/FixCursorHold.nvim",
-      {
-        "nvim-neotest/neotest-go",
-        ft = "go",
-      },
-    },
-    keys = {
-      {
-        "<leader>tn",
-        function()
-          require("neotest").run.run()
-        end,
-        desc = "Run nearest test",
-      },
-      {
-        "<leader>tf",
-        function()
-          require("neotest").run.run(vim.fn.expand "%")
-        end,
-        desc = "Run test file",
-      },
-      {
-        "<leader>ts",
-        function()
-          require("neotest").run.run { suite = true }
-        end,
-        desc = "Run test suite",
-      },
-      {
-        "<leader>tl",
-        function()
-          require("neotest").run.run_last()
-        end,
-        desc = "Run last test",
-      },
-      {
-        "<leader>to",
-        function()
-          require("neotest").output.open()
-        end,
-        desc = "Show test output",
-      },
-      {
-        "<leader>tX",
-        function()
-          require("neotest").run.stop()
-        end,
-        desc = "Stop tests",
-      },
-      {
-        "<leader>tw",
-        function()
-          require("neotest").summary.toggle()
-        end,
-        desc = "Toggle test summary",
-      },
-    },
-    config = function()
-      require("neotest").setup {
-        adapters = {
-          require "neotest-go",
-        },
-      }
-    end,
-  },
+
 
   -- ── npm package versions in package.json ────────────────────────────────
   {
@@ -603,28 +464,47 @@ return {
     end,
   },
 
-  -- ── Task runner: go build, npm run dev, docker compose... ────────────────
-  {
-    "stevearc/overseer.nvim",
-    cmd = { "OverseerRun", "OverseerToggle", "OverseerBuild" },
-    keys = {
-      { "<leader>or", "<cmd>OverseerRun<cr>", desc = "Run task" },
-      { "<leader>ot", "<cmd>OverseerToggle<cr>", desc = "Toggle task list" },
-      { "<leader>ow", "<cmd>OverseerWatch<cr>", desc = "Watch task output" },
-    },
-    opts = {
-      strategy = "toggleterm",
-    },
-    config = function(_, opts)
-      require("overseer").setup(opts)
-    end,
-  },
+
 
   -- ── NvChad overrides (explicit config to bypass lazy auto-detection) ──
   {
     "folke/which-key.nvim",
-    config = function(_, opts)
-      require("which-key").setup(opts)
+    config = function()
+      require("which-key").setup {
+        delay = 0,
+        icons = {
+          mappings = false,
+        },
+        spec = {
+          { "<leader>f", group = "Find" },
+          { "<leader>g", group = "Git" },
+          { "<leader>r", group = "go" },
+          { "<leader>x", group = "Diagnostics" },
+          { "<leader>t", hidden = true },
+          { "<leader>h", hidden = true },
+          { "<leader>v", hidden = true },
+          { "<leader>p", hidden = true },
+          { "<leader>q", hidden = true },
+          { "<leader>wK", hidden = true },
+          { "<leader>wk", hidden = true },
+          { "<leader>c", hidden = true },
+          { "<leader>o", hidden = true },
+          { "<leader>d", hidden = true },
+          { "<leader>b", hidden = true },
+          { "<leader>s", hidden = true },
+          { "<leader>m", hidden = true },
+          { "<leader>n", hidden = true },
+          -- keymaps disabled dentro de grupos visibles
+          { "<leader>fa", hidden = true },
+          { "<leader>fz", hidden = true },
+          { "<leader>fh", hidden = true },
+          { "<leader>fc", hidden = true },
+          { "<leader>gb", hidden = true },
+          { "<leader>gd", hidden = true },
+          { "<leader>rn", hidden = true },
+          { "<leader>xb", hidden = true },
+        },
+      }
     end,
   },
   {
@@ -699,10 +579,6 @@ return {
   {
     "stevearc/aerial.nvim",
     cmd = { "AerialToggle", "AerialOpen", "AerialNavToggle" },
-    keys = {
-      { "<leader>oa", "<cmd>AerialToggle<cr>", desc = "Toggle symbol outline" },
-      { "<leader>oA", "<cmd>AerialNavToggle<cr>", desc = "Toggle outline nav" },
-    },
     opts = {
       backends = { "treesitter", "lsp", "markdown" },
       layout = { min_width = 30, max_width = 50 },
@@ -741,58 +617,7 @@ return {
     end,
   },
 
-  -- ── Harpoon: quick file marks ────────────────────────────────────────────────
-  {
-    "ThePrimeagen/harpoon",
-    branch = "harpoon2",
-    keys = {
-      {
-        "<leader>ha",
-        function()
-          require("harpoon"):list():add()
-        end,
-        desc = "Add file to harpoon",
-      },
-      {
-        "<leader>hm",
-        function()
-          require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
-        end,
-        desc = "Harpoon menu",
-      },
-      {
-        "<A-1>",
-        function()
-          require("harpoon"):list():select(1)
-        end,
-        desc = "Harpoon file 1",
-      },
-      {
-        "<A-2>",
-        function()
-          require("harpoon"):list():select(2)
-        end,
-        desc = "Harpoon file 2",
-      },
-      {
-        "<A-3>",
-        function()
-          require("harpoon"):list():select(3)
-        end,
-        desc = "Harpoon file 3",
-      },
-      {
-        "<A-4>",
-        function()
-          require("harpoon"):list():select(4)
-        end,
-        desc = "Harpoon file 4",
-      },
-    },
-    config = function(_, opts)
-      require("harpoon").setup(opts)
-    end,
-  },
+
 
   -- ── Project-local LSP config (.neoconf.json) ──────────────────────────────────
   {
@@ -804,62 +629,10 @@ return {
     end,
   },
 
-  -- ── Clipboard history (Telescope) ──────────────────────────────────────────────
-  {
-    "AckslD/nvim-neoclip.lua",
-    keys = {
-      {
-        "<leader>fc",
-        function()
-          require("telescope").extensions.neoclip.default()
-        end,
-        desc = "Clipboard history",
-      },
-    },
-    dependencies = {
-      { "kkharji/sqlite.lua", module = "sqlite" },
-      { "nvim-telescope/telescope.nvim" },
-    },
-    opts = {
-      history = 1000,
-      enable_persistent_history = true,
-      length_limit = 1048576,
-      continuous_sync = true,
-      db_path = vim.fn.stdpath "data" .. "/neoclip/db.sqlite3",
-    },
-    config = function(_, opts)
-      require("neoclip").setup(opts)
-      require("telescope").load_extension "neoclip"
-    end,
-  },
-
   -- ── Session persistence (guardar/restaurar sesión por proyecto) ────────────────
   {
     "folke/persistence.nvim",
     event = "BufReadPre",
-    keys = {
-      {
-        "<leader>qs",
-        function()
-          require("persistence").load()
-        end,
-        desc = "Restore last session",
-      },
-      {
-        "<leader>qS",
-        function()
-          require("persistence").save()
-        end,
-        desc = "Save current session",
-      },
-      {
-        "<leader>qd",
-        function()
-          require("persistence").stop()
-        end,
-        desc = "Don't save current session",
-      },
-    },
     opts = {
       dir = vim.fn.stdpath("state") .. "/sessions/",
       need = 1,
@@ -867,18 +640,6 @@ return {
     },
     config = function(_, opts)
       require("persistence").setup(opts)
-    end,
-  },
-
-  -- ── Visual sorting ────────────────────────────────────────────────────────────
-  {
-    "sQVe/sort.nvim",
-    keys = {
-      { "<leader>qs", "<cmd>Sort<cr>", mode = "v", desc = "Sort selection" },
-    },
-    opts = {},
-    config = function(_, opts)
-      require("sort").setup(opts)
     end,
   },
 
