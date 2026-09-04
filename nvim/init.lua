@@ -2,6 +2,9 @@ vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
 vim.o.cmdheight = 0
 
+-- bytecode cache de módulos Lua (startup más rápido)
+vim.loader.enable()
+
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 

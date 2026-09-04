@@ -1,5 +1,29 @@
 require("nvchad.configs.lspconfig").defaults()
 
+-- ── blink.cmp: inyectar sus capabilities a todos los clientes LSP ──────────
+-- NvChad ya definió vim.lsp.config("*") con capabilities + on_init (apaga
+-- semantic tokens). Tomamos sus capabilities como base y forzamos las de
+-- blink encima, preservando on_init.
+local base = vim.lsp.config["*"]
+vim.lsp.config("*", {
+  capabilities = vim.tbl_deep_extend(
+    "force",
+    base.capabilities,
+    require("blink.cmp").get_lsp_capabilities({}, false)
+  ),
+  on_init = base.on_init,
+})
+
+-- ── Keymaps LSP extra (NvChad v2.5 no mapea code actions) ───────────────────
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {
+      buffer = args.buf,
+      desc = "LSP code action",
+    })
+  end,
+})
+
 -- ── Servidores simples (sin config extra) ────────────────────────────────────
 vim.lsp.enable { "html", "cssls", "emmet_ls" }
 

@@ -52,12 +52,12 @@ M.nvdash = {
       return vim.v.shell_error == 0 and out or ""
     end
 
-    local repo = git "git rev-parse --show-toplevel 2>nul"
+    local repo = git "git rev-parse --show-toplevel 2>/dev/null"
     if repo ~= "" then
       repo = vim.fn.fnamemodify(repo, ":t")
     end
-    local user = git "git config user.name 2>nul"
-    local branch = git "git branch --show-current 2>nul"
+    local user = git "git config user.name 2>/dev/null"
+    local branch = git "git branch --show-current 2>/dev/null"
 
     local btns = {}
 

@@ -12,6 +12,7 @@ return {
   -- ── LSP ───────────────────────────────────────────────────────────────────
   {
     "neovim/nvim-lspconfig",
+    dependencies = { "saghen/blink.cmp" },
     config = function()
       require "configs.lspconfig"
     end,
@@ -118,6 +119,7 @@ return {
     ft = { "dart" },
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "saghen/blink.cmp",
     },
     config = function()
       require "configs.flutter"
@@ -146,8 +148,9 @@ return {
     dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
-        -- Lua
+        -- Lua (lua_ls lo habilita NvChad por default)
         "stylua",
+        "lua-language-server",
         -- Go
         "gopls",
         "goimports",
@@ -156,6 +159,7 @@ return {
         -- JS / TS / React
         "prettier",
         "eslint_d",
+        "vtsls",
         -- Markdown
         "markdownlint-cli2",
         "markdownlint",
@@ -172,9 +176,15 @@ return {
         "json-lsp",
         -- Astro
         "astro-language-server",
+        -- HTML / CSS / Emmet (vim.lsp.enable en lspconfig.lua)
+        "html-lsp",
+        "css-lsp",
+        "emmet-ls",
+        -- Tailwind CSS
+        "tailwindcss-language-server",
       },
       auto_update = false,
-      run_on_start = true,
+      run_on_start = false, -- tools ya instalados; no checar versiones en cada arranque
     },
     config = function(_, opts)
       require("mason-tool-installer").setup(opts)
@@ -308,14 +318,43 @@ return {
     end,
   },
 
-  -- ── Autocompletar (sin Copilot) ────────────────────────────────────────────
+  -- ── Autocompletar (blink.cmp: nativo, sin íconos, ultra rápido) ─────────────
   {
-    "hrsh7th/nvim-cmp",
-    opts = {},
+    "saghen/blink.cmp",
+    version = "1.*", -- v2 (main) requiere blink.lib compilado con Rust
+    event = "InsertEnter",
+    opts = {
+      keymap = {
+        preset = "default",
+      },
+      appearance = {
+        -- sin íconos de kind (plano, minimalista)
+        use_nvim_cmp_as_default = false,
+        kind_icons = {},
+      },
+      sources = {
+        default = { "lsp", "path", "buffer" },
+      },
+      completion = {
+        list = { selection = { preselect = false } },
+        documentation = {
+          auto_show = true,
+          window = { border = "single" },
+        },
+      },
+      signature = {
+        enabled = true,
+        window = { border = "single" },
+      },
+    },
     config = function(_, opts)
-      require("cmp").setup(opts)
+      require("blink.cmp").setup(opts)
     end,
   },
+
+  -- NvChad v2.5 trae su propio stack nvim-cmp + LuaSnip + autopairs;
+  -- deshabilitado a favor de blink.cmp (sus deps ya no cargan)
+  { "hrsh7th/nvim-cmp", enabled = false },
 
   -- ── Terminal (lazygit, lazydocker, Go commands) ─────────────────────────────
   {
@@ -345,6 +384,23 @@ return {
     dependencies = { "akinsho/toggleterm.nvim" },
   },
 
+  -- ── Harpoon: "favoritos" de archivos del ciclo de trabajo ──────────────────
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    keys = {
+      { "<leader>ha", function() require("harpoon"):list():add() end, desc = "Add file" },
+      { "<leader>h1", function() require("harpoon"):list():select(1) end, desc = "File 1" },
+      { "<leader>h2", function() require("harpoon"):list():select(2) end, desc = "File 2" },
+      { "<leader>h3", function() require("harpoon"):list():select(3) end, desc = "File 3" },
+      { "<leader>h4", function() require("harpoon"):list():select(4) end, desc = "File 4" },
+      { "<leader>hm", function() require("harpoon").ui:toggle_quick_menu(require("harpoon"):list()) end, desc = "Menu" },
+    },
+    config = function()
+      require("harpoon").setup {}
+    end,
+  },
+
   -- ── HTTP requests (httpie alternativa) ─────────────────────────────────────
   {
     "rest-nvim/rest.nvim",
@@ -368,6 +424,38 @@ return {
     },
     config = function(_, opts)
       require("gitblame").setup(opts)
+    end,
+  },
+
+  -- ── Autopairs: auto-cierre de ()[]{} (mini.* = consistente con surround) ──
+  {
+    "echasnovski/mini.pairs",
+    event = "InsertEnter",
+    opts = {},
+    config = function(_, opts)
+      require("mini.pairs").setup(opts)
+    end,
+  },
+
+  -- ── mini.move: mover líneas/bloques con Alt+hjkl ─────────────────────────
+  {
+    "echasnovski/mini.move",
+    keys = {
+      { "<A-j>", mode = { "n", "v" }, desc = "Move down" },
+      { "<A-k>", mode = { "n", "v" }, desc = "Move up" },
+      { "<A-h>", mode = { "n", "v" }, desc = "Move left" },
+      { "<A-l>", mode = { "n", "v" }, desc = "Move right" },
+    },
+    opts = {
+      mappings = {
+        left = "<A-h>",
+        right = "<A-l>",
+        down = "<A-j>",
+        up = "<A-k>",
+      },
+    },
+    config = function(_, opts)
+      require("mini.move").setup(opts)
     end,
   },
 
@@ -476,12 +564,11 @@ return {
           mappings = false,
         },
         spec = {
-          { "<leader>f", group = "Find" },
+{ "<leader>f", group = "Find" },
           { "<leader>g", group = "Git" },
           { "<leader>r", group = "go" },
           { "<leader>x", group = "Diagnostics" },
-          { "<leader>t", hidden = true },
-          { "<leader>h", hidden = true },
+          { "<leader>h", group = "Harpoon" },
           { "<leader>v", hidden = true },
           { "<leader>p", hidden = true },
           { "<leader>q", hidden = true },
@@ -626,20 +713,6 @@ return {
     opts = {},
     config = function(_, opts)
       require("neoconf").setup(opts)
-    end,
-  },
-
-  -- ── Session persistence (guardar/restaurar sesión por proyecto) ────────────────
-  {
-    "folke/persistence.nvim",
-    event = "BufReadPre",
-    opts = {
-      dir = vim.fn.stdpath("state") .. "/sessions/",
-      need = 1,
-      branch = true,
-    },
-    config = function(_, opts)
-      require("persistence").setup(opts)
     end,
   },
 

@@ -1,12 +1,12 @@
 -- Flutter-tools.nvim config
 -- Docs: https://github.com/akinsho/flutter-tools.nvim
 
--- Capabilities: usar las de nvim-cmp si están disponibles
-local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+-- Capabilities: usar las de blink.cmp si está disponible
+local has_blink, blink = pcall(require, "blink.cmp")
 local capabilities = vim.tbl_deep_extend(
   "force",
   vim.lsp.protocol.make_client_capabilities(),
-  has_cmp and cmp_nvim_lsp.default_capabilities() or {}
+  has_blink and blink.get_lsp_capabilities({}, false) or {}
 )
 
 require("flutter-tools").setup {

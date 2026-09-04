@@ -3,3 +3,6 @@
 
 # Serena MCP tool cache/state (machine-specific)
 .serena/
+
+# Artefacto accidental de redirección `2>nul` en Windows git bash
+nul

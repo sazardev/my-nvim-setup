@@ -2,7 +2,6 @@ require "nvchad.mappings"
 
 -- ── Disable NvChad keymaps we don't use ──────────────────────────────────────
 local map = vim.keymap.set
-map("n", "<leader>h", "<Nop>", { desc = "disabled" })
 map("n", "<leader>v", "<Nop>", { desc = "disabled" })
 map("n", "<leader>pt", "<Nop>", { desc = "disabled" })
 map("n", "<leader>fa", "<Nop>", { desc = "disabled" })
