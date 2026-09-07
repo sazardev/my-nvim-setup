@@ -44,8 +44,6 @@ return {
         "dart",
         -- Astro
         "astro",
-        -- rest.nvim (parser HTTP)
-        "http",
       },
     },
     config = function(_, opts)
@@ -107,6 +105,9 @@ return {
     "ray-x/go.nvim",
     dependencies = { "ray-x/guihua.lua" },
     ft = { "go", "gomod", "gowork" },
+    cond = function()
+      return not require("configs.resources").light
+    end,
     build = ':lua require("go.install").update_all_sync()',
     config = function()
       require("go").setup()
@@ -147,42 +148,45 @@ return {
     lazy = false,
     dependencies = { "mason-org/mason.nvim" },
     opts = {
-      ensure_installed = {
-        -- Lua (lua_ls lo habilita NvChad por default)
-        "stylua",
-        "lua-language-server",
-        -- Go
-        "gopls",
-        "goimports",
-        "gofumpt",
-        "golangci-lint",
-        -- JS / TS / React
-        "prettier",
-        "eslint_d",
-        "vtsls",
-        -- Markdown
-        "markdownlint-cli2",
-        "markdownlint",
-        -- Otros
-        "jsonlint",
-        -- Prisma (schemas multitenancy)
-        "prisma-language-server",
-        -- Docker (Dockerfile + docker-compose.yml)
-        "dockerfile-language-server",
-        "docker-compose-language-service",
+      ensure_installed = require("configs.resources").light
+          -- Modo ligero: solo formatters efímeros; cero LSP/linters residentes
+          and { "goimports", "gofumpt" }
+        or {
+          -- Lua (lua_ls lo habilita NvChad por default)
+          "stylua",
+          "lua-language-server",
+          -- Go
+          "gopls",
+          "goimports",
+          "gofumpt",
+          "golangci-lint",
+          -- JS / TS / React
+          "prettier",
+          "eslint_d",
+          "vtsls",
+          -- Markdown
+          "markdownlint-cli2",
+          "markdownlint",
+          -- Otros
+          "jsonlint",
+          -- Prisma (schemas multitenancy)
+          "prisma-language-server",
+          -- Docker (Dockerfile + docker-compose.yml)
+          "dockerfile-language-server",
+          "docker-compose-language-service",
 
-        -- ESLint LSP (code actions) + JSON LSP (schema validation)
-        "eslint-lsp",
-        "json-lsp",
-        -- Astro
-        "astro-language-server",
-        -- HTML / CSS / Emmet (vim.lsp.enable en lspconfig.lua)
-        "html-lsp",
-        "css-lsp",
-        "emmet-ls",
-        -- Tailwind CSS
-        "tailwindcss-language-server",
-      },
+          -- ESLint LSP (code actions) + JSON LSP (schema validation)
+          "eslint-lsp",
+          "json-lsp",
+          -- Astro
+          "astro-language-server",
+          -- HTML / CSS / Emmet (vim.lsp.enable en lspconfig.lua)
+          "html-lsp",
+          "css-lsp",
+          "emmet-ls",
+          -- Tailwind CSS
+          "tailwindcss-language-server",
+        },
       auto_update = false,
       run_on_start = false, -- tools ya instalados; no checar versiones en cada arranque
     },
@@ -324,8 +328,13 @@ return {
     version = "1.*", -- v2 (main) requiere blink.lib compilado con Rust
     event = "InsertEnter",
     opts = {
+      -- Tab elige la opción de la lista, Enter la inserta (sin flechas)
       keymap = {
-        preset = "default",
+        preset = "enter",
+        ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+        ["<Up>"] = false,
+        ["<Down>"] = false,
       },
       appearance = {
         -- sin íconos de kind (plano, minimalista)
@@ -374,16 +383,6 @@ return {
     end,
   },
 
-  -- ── lazygit integration ────────────────────────────────────────────────────
-  {
-    "kdheepak/lazygit.nvim",
-    cmd = "LazyGit",
-    keys = {
-      { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open lazygit" },
-    },
-    dependencies = { "akinsho/toggleterm.nvim" },
-  },
-
   -- ── Harpoon: "favoritos" de archivos del ciclo de trabajo ──────────────────
   {
     "ThePrimeagen/harpoon",
@@ -398,18 +397,6 @@ return {
     },
     config = function()
       require("harpoon").setup {}
-    end,
-  },
-
-  -- ── HTTP requests (httpie alternativa) ─────────────────────────────────────
-  {
-    "rest-nvim/rest.nvim",
-    ft = "http",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    build = false, -- evitar LuaRocks (tree-sitter-http falla en Windows)
-    opts = {},
-    config = function(_, opts)
-      require("rest-nvim").setup(opts)
     end,
   },
 
@@ -505,6 +492,20 @@ return {
     },
     config = function(_, opts)
       require("illuminate").configure(opts)
+    end,
+  },
+
+  -- ── Preview de colores (hex, rgb, clases Tailwind) inline ─────────────────
+  {
+    "brenoprata10/nvim-highlight-colors",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+      render = "background",
+      enable_named_colors = true,
+      enable_tailwind = true,
+    },
+    config = function(_, opts)
+      require("nvim-highlight-colors").setup(opts)
     end,
   },
 

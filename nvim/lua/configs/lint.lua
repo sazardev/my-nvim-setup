@@ -37,6 +37,25 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   end,
 })
 
+-- ── Modo ligero: go vet (efímero) en vez de golangci-lint residente ──────────
+-- nvim-lint no trae "govet" de fábrica (solo "golangcilint"), así que lo
+-- definimos: go vet ya viene con el toolchain, cero instalación extra.
+lint.linters.govet = {
+  cmd = "go",
+  args = { "vet", "./..." },
+  stdin = false,
+  ignore_exitcode = true,
+  append_fname = false,
+  stream = "stderr",
+  parser = require("lint.parser").from_errorformat("%f:%l:%c: %m", {
+    source = "govet",
+  }),
+}
+
+if require("configs.resources").light then
+  lint.linters_by_ft.go = { "govet" }
+end
+
 -- InsertLeave: solo linters livianos. golangci-lint analiza todo el paquete
 -- y correrlo en cada salida de insert satura CPU en máquinas de bajos recursos.
 vim.api.nvim_create_autocmd("InsertLeave", {

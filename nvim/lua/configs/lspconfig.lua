@@ -1,3 +1,11 @@
+local res = require "configs.resources"
+
+if res.light then
+  -- Modo ligero: ningún LSP residente. Sin autocomplete inteligente ni
+  -- jump-to-def; formateo on-demand (conform) y lint on-demand (nvim-lint).
+  return
+end
+
 require("nvchad.configs.lspconfig").defaults()
 
 -- ── blink.cmp: inyectar sus capabilities a todos los clientes LSP ──────────
