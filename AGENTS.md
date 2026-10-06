@@ -14,9 +14,39 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 ## How it works
 
 - Plugins auto-install via `lazy.nvim` on first open
+- Activate the auto-reload hook once per clone: `git config core.hooksPath .githooks` (the hook picks the right data dir for Windows or Linux)
 - LSP servers and tools (gopls, vtsls, stylua, prettier, eslint_d, dart, etc.) auto-install via `mason-tool-installer`
 - No manual setup beyond the symlink
-- **Auto-reload**: `.githooks/post-merge` creates a marker on `git pull`; `autocmds.lua` detects it on `UIEnter` and runs `luafile $MYVIMRC` to reload config automatically
+- **Auto-reload**: `.githooks/post-merge` creates a marker on `git pull`; `core/autocmds/reload.lua` detects it on `UIEnter` and runs `luafile $MYVIMRC` to reload config automatically
+
+## Architecture
+
+Un archivo = una responsabilidad. Entrada mínima en `nvim/init.lua`; todo lo demás es modular:
+
+```
+nvim/
+├── init.lua                  # solo bootstrap (lazy + core)
+└── lua/
+    ├── core/                 # arranque: settings, light, lazy, options, clipboard, theme
+    │   ├── settings.lua      #   TODOS los ajustes configurables (+ overrides locales)
+    │   ├── keymaps/          #   cleanup (quita NvChad) · general
+    │   └── autocmds/         #   reload · treesitter · ui
+    ├── languages/            # 1 archivo por lenguaje: DECLARA treesitter, lsp, mason, formatters, linters, menú
+    │   ├── init.lua          #   registro: agrega las declaraciones y las sirve a cada consumidor
+    │   └── actions/          #   acciones de los menús (go, dart, typescript, python, rust, jvm...)
+    ├── servers/              # overrides por servidor LSP (servers/<nombre>.lua) + cargador
+    ├── menus/                # menús contextuales del leader (buffer-locales) + contexto Git
+    ├── plugins/<grupo>/      # 1 spec de lazy por plugin: core lsp tools syntax languages navigation editing git ui
+    ├── ui/                   # dashboard, highlights, lualine (tema + componentes)
+    ├── utils/                # helpers puros: terminal, project, actions, git, log, telescope
+    └── chadrc.lua            # solo compone: tema + dashboard + ui de NvChad
+```
+
+**Añadir un lenguaje**: crea `lua/languages/<nombre>.lua` (contrato en `languages/init.lua`) y agrégalo a `NAMES`. No hay que tocar mason, treesitter, conform, nvim-lint ni LSP: salen del registro. Overrides de un servidor: `lua/servers/<servidor>.lua`.
+
+**Añadir un plugin**: un archivo en `lua/plugins/<grupo>/`. Grupos nuevos: agrégalos a `GROUPS` en `core/lazy.lua`.
+
+**Ajustes por máquina**: `lua/local.lua` (ignorado por git) devuelve una tabla parcial que se mezcla sobre `core/settings.lua` (tema, lenguajes desactivados, format-on-save, opciones de vim, clipboard, modo ligero...). Ejemplo: `return { languages = { disabled = { "astro" } } }`.
 
 ## Key tools included
 
@@ -28,12 +58,12 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 | Completion | blink.cmp, mini.pairs |
 | Terminal | toggleterm, lazydocker (via TermExec) |
 | Navigation | harpoon (<leader>h*), flash.nvim (s/S), aerial (symbol outline), nvim-ufo (folds) |
-| UI | lualine, gitsigns, dressing, vim-illuminate, render-markdown, todo-comments, nvim-highlight-colors (hex/rgb/Tailwind preview) |
+| UI | lualine, gitsigns, vim-illuminate, render-markdown, todo-comments, nvim-highlight-colors (hex/rgb/Tailwind preview) |
 | Other | Telescope+fzf-native, nvim-tree, Trouble, autotag, git-blame, grug-far (<leader>fr global replace), mini.surround, mini.move (Alt+hjkl), neoconf, package-info |
 
 ## Performance
 
-- **git-blame** is off by default — toggle with `<leader>gb` (no `BufRead` overhead)
+- **git-blame** is off by default — toggle with `<leader>Gb` (no `BufRead` overhead)
 - **Telescope** respects `.gitignore` in `find_files` (skip `node_modules`, `dist/`, etc.)
 - **nvim-tree** hides git-ignored dirs by default — toggle with `I` or `git.ignore = false`
 - Plugins are lazy-loaded via events, ft, cmd, or keys (not on startup)
@@ -43,7 +73,11 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 
 ## Gotchas
 
-- **Windows-only config**: paths assume Windows, uses `gcc` for treesitter (avoids MSVC)
+- **Clipboard (WSL/SSH sin DISPLAY)**: `core/clipboard.lua` usa OSC 52 para copiar (Alacritty + herdr lo reenvían); pegar desde el sistema es Ctrl+Shift+V en la terminal
+- **ysc (YarnSpinner linter)** es opcional: se activa solo si `ysc` está en el PATH (`dotnet tool install -g yarn-spinner`, requiere `dotnet`)
+- **`:checkhealth mason`** avisa de ruby/gem/php/java/julia/composer/luarocks ausentes: es solo informativo, ningún tool de la config los necesita
+- **Menús contextuales del leader** (`lua/menus/` + campo `menu` de cada lenguaje): cada lenguaje tiene su letra y solo existe en buffers de ese filetype (g Go, d Dart, r Rust, p Python, t TS/JS, m Markdown, s CSS, j Java, k Kotlin); `<leader>G` Git solo dentro de un repo. Para añadir un lenguaje: nueva entrada en la tabla `langs`. No definas un mapeo que sea a la vez acción y prefijo de otros (p. ej. `<leader>h` + `<leader>h1`): which-key lo resuelve tras `timeoutlen` y cierra el popup
+- **Treesitter** compila parsers con el compilador de C del sistema (`gcc`) y requiere el binario `tree-sitter` (`tree-sitter-cli`)
 - **No standalone run**: this is a config repo, must be symlinked to Neovim's config path
 - **lazy-lock.json** committed for reproducible plugin versions
 - `.claude/settings.local.json` is NOT committed (machine-specific permissions)
@@ -52,4 +86,4 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 - **flash.nvim** keymaps: `s` jump to any word label, `S` jump to treesitter nodes (preserves native `r` replace char)
 - **telescope-fzf-native** requires `cmake` installed on the system (auto-disabled if missing via `enabled`)
 - **Auto-reload limitation**: `luafile $MYVIMRC` reloads Lua config but does NOT install/remove plugins or treesitter parsers. For plugin changes, use `:Lazy sync` or restart nvim.
-- **Light mode** (`nvim/lua/configs/resources.lua`): auto-detects RAM ≤ 2GB and disables all resident stuff — LSP servers, go.nvim, golangci-lint (falls back to `go vet`). Mason installs only `goimports`+`gofumpt`. Keeps treesitter + conform (ephemeral formatters) + nvim-lint. Override with `NVIM_LIGHT=1|0` env or `vim.g.light_mode`.
+- **Light mode** (`nvim/lua/core/light.lua`): auto-detects RAM ≤ 2GB and disables all resident stuff — LSP servers, go.nvim, golangci-lint (falls back to `go vet`). Mason installs only `goimports`+`gofumpt`. Keeps treesitter + conform (ephemeral formatters) + nvim-lint. Override with `NVIM_LIGHT=1|0` env, `settings.light.force` or `vim.g.light_mode`.

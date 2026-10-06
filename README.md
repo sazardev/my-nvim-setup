@@ -27,12 +27,27 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 
 ## Keymaps
 
+### Menús contextuales del leader
+
+El popup de `<leader>` muestra solo lo que aplica al archivo actual (keymaps buffer-local, ver `nvim/lua/menus/` y el campo `menu` de cada archivo en `nvim/lua/languages/`). Los comandos corren en un terminal flotante desde la raíz del proyecto.
+
+| Prefijo | Aparece en | Acciones |
+|---------|-----------|----------|
+| `<leader>g` | Go (`go`, `gomod`, `gowork`) | `r` run, `b` build, `v` vet/lint, `f` format, `t` mod tidy, `x` lint --fix, `m` test |
+| `<leader>d` | Dart | `r` run, `d` debug, `h` hot reload, `R` restart, `q` quit, `D` devices, `e` emulators, `o` outline, `l` log, `t` devtools, `p` pub get, `m` test, `v` analyze, `x` dart fix, `f` format |
+| `<leader>r` | Rust | `r` run, `b` build, `m` test, `c` check, `v` clippy, `x` clippy --fix, `f` cargo fmt |
+| `<leader>p` | Python | `r` run (uv si hay pyproject), `i` REPL, `m` pytest, `t` pytest del archivo, `v` ruff check, `x` ruff --fix, `f` ruff format |
+| `<leader>t` | TS / JS | `r` elegir script, `d` dev, `b` build, `m` test, `v` lint, `c` tsc, `x` eslint --fix, `f` format, `o` organize imports, `i` install (detecta pnpm/yarn/bun/npm) |
+| `<leader>m` | Markdown | `r` toggle render, `o` outline, `f` format |
+| `<leader>s` | CSS / SCSS / Less | `f` format, `c` color preview, `o` outline |
+| `<leader>j` / `<leader>k` | Java / Kotlin | `r` run, `b` build, `m` test, `v` check/verify, `c` clean (Gradle o Maven) |
+| `<leader>G` | Cualquier archivo dentro de un repo git | `t` status, `b` blame toggle |
+
+### Globales
+
 | Key | Action |
 |-----|--------|
 | `<leader>tt` | Toggle float terminal |
-| `<leader>gg` | Open lazygit |
-| `<leader>gd` | Open lazydocker |
-| `<leader>gb` | Toggle git blame inline |
 | `<leader>du` | Toggle DAP UI |
 | `<leader>xx` | Diagnostics (Trouble) |
 | `<leader>xb` | Buffer diagnostics |
@@ -48,12 +63,6 @@ Then open Neovim — lazy.nvim will auto-install all plugins.
 | `<leader>to` | Show test output |
 | `<leader>or` | Run task (overseer) |
 | `<leader>ot` | Toggle task list |
-| `<leader>rr` | Go run (floating terminal, detects module vs standalone script) |
-| `<leader>rb` | Go build |
-| `<leader>rv` | Go vet / golangci-lint run |
-| `<leader>rx` | golangci-lint run --fix |
-| `<leader>rf` | Go format on demand (conform) |
-| `<leader>rd` | Go doc offline (cursor word, via go.nvim `:GoDoc`) |
 | `;` | Command mode |
 | `jk` | Escape (insert mode) |
 | `<C-LeftMouse>` | Go to definition |

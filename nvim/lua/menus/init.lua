@@ -1,0 +1,74 @@
+-- ── Menús contextuales del leader ────────────────────────────────────────────
+-- Cada contexto (lenguaje o git) vive bajo su propia letra de <leader> y SOLO
+-- existe en los buffers donde aplica (keymaps + grupo de which-key
+-- buffer-locales). El popup de <leader> muestra únicamente lo relevante.
+--
+-- Un contexto es: { name, prefix, maps = { {key, desc, fn}... },
+--                   filetypes? = {...}, detect? = fun(buf): boolean }
+local M = {}
+
+---@return table[]
+local function contexts()
+  local list = require("languages").menus()
+  table.insert(list, require "menus.git")
+  return list
+end
+
+---@param buf integer
+---@param ctx table
+local function bind(buf, ctx)
+  local seen = vim.b[buf].menu_contexts or {}
+  if seen[ctx.prefix] == ctx.name then
+    return
+  end
+  seen[ctx.prefix] = ctx.name
+  vim.b[buf].menu_contexts = seen
+
+  for _, m in ipairs(ctx.maps) do
+    vim.keymap.set("n", "<leader>" .. ctx.prefix .. m[1], m[3], { buffer = buf, desc = m[2] })
+  end
+  -- nombre del grupo en which-key, solo para este buffer
+  local ok, wk = pcall(require, "which-key")
+  if ok then
+    wk.add { { "<leader>" .. ctx.prefix, group = ctx.name, buffer = buf } }
+  end
+end
+
+---@param ctx table
+---@param buf integer
+---@return boolean
+local function applies(ctx, buf)
+  if ctx.detect then
+    return ctx.detect(buf)
+  end
+  return vim.tbl_contains(ctx.filetypes or {}, vim.bo[buf].filetype)
+end
+
+function M.setup()
+  local list = contexts()
+
+  local function attach(buf)
+    for _, ctx in ipairs(list) do
+      if applies(ctx, buf) then
+        bind(buf, ctx)
+      end
+    end
+  end
+
+  local group = vim.api.nvim_create_augroup("MenuContexts", { clear = true })
+  vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufNewFile", "BufFilePost" }, {
+    group = group,
+    callback = function(args)
+      attach(args.buf)
+    end,
+  })
+
+  -- los keymaps se cargan con vim.schedule: los eventos del buffer inicial ya pasaron
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      attach(buf)
+    end
+  end
+end
+
+return M

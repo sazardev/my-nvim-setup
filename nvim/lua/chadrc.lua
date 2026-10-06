@@ -1,91 +1,22 @@
--- This file needs to have same structure as nvconfig.lua
+-- Este archivo debe tener la misma estructura que nvconfig.lua
 -- https://github.com/NvChad/ui/blob/v3.0/lua/nvconfig.lua
--- Please read that file to know all available options :(
+-- Aquí solo se COMPONE la configuración; cada parte vive en su módulo.
+
+local settings = require "core.settings"
 
 ---@type ChadrcConfig
 local M = {}
 
 M.base46 = {
-  theme = "gruvbox",
-  theme_toggle = { "gruvbox", "gruvbox_light" },
-
-  hl_override = {
-    Comment = { italic = true },
-    ["@comment"] = { italic = true },
-    St_gitIcons = { fg = "white", bg = "lightbg", bold = true },
-
-    -- Funciones: el tema base usaba base0D (el azul "nord" apagado del
-    -- gruvbox de NvChad) para nombres/llamadas de función. Lo cambiamos al
-    -- aqua vivo (base0C, ya usado en @constructor) + bold para que resalten.
-    Function = { fg = "base0C", bold = true },
-    ["@function"] = { fg = "base0C", bold = true },
-    ["@function.builtin"] = { fg = "base0C", bold = true },
-    ["@function.call"] = { fg = "base0C", bold = true },
-    ["@function.method"] = { fg = "base0C", bold = true },
-    ["@function.method.call"] = { fg = "base0C", bold = true },
-
-    -- Operadores (+, -, =, etc.): el tema (polish_hl en themes/gruvbox.lua)
-    -- los pintaba con el MISMO azul apagado que las funciones, quedando
-    -- planos. Les damos su propio tono cálido para que no se pierdan.
-    Operator = { fg = "orange" },
-    ["@operator"] = { fg = "orange" },
-  },
+  theme = settings.theme.name,
+  theme_toggle = settings.theme.toggle,
+  hl_override = require("ui.highlights").overrides(),
 }
 
-M.nvdash = {
-  load_on_startup = true,
-  header = {
-    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡲⠃⡰⣆⠀⠀",
-    "⠀⠀⠀⠀⠀⠀⠀⢀⡔⢡⠮⡠⠊⣰⠂⠀⠀",
-    "⠀⠀⠀⠀⠀⠀⢀⠎⠠⡧⠊⠀⡠⠁⠀⠀⠀",
-    "⠀⠀⠀⠀⠀⠀⡘⠀⠀⠀⠀⡔⠃⠀⠀⠀⠀",
-    "⠀⠀⠀⠀⠀⠀⣯⣃⣾⡧⠊⠀⠀⠀⠀⠀⠀",
-    "⠀⠀⠀⠀⠀⠀⢀⣿⣿⣥⠀⠀⠀⣀⣤⠾⠷",
-    "⠀⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⣶⡿⠋⠉⠀⠀",
-    "⠀⠀⠀⠀⠈⣻⠿⣿⣿⣿⡿⠛⠃⠀⠀⠀⠀",
-    "⠀⠀⣤⣔⠎⠇⠙⠀⢧⢸⠀⠀⠀⠀⠀⠀⠀",
-    "⠐⠊⠁⠁⠀⠀⠀⠀⠸⢸⠀⠀⠀⠀⠀⠀⠀",
-  },
-  buttons = function()
-    local git = function(cmd)
-      local out = vim.fn.system(cmd):gsub("[\n\r]", "")
-      return vim.v.shell_error == 0 and out or ""
-    end
+M.nvdash = require("ui.dashboard").config()
 
-    local repo = git "git rev-parse --show-toplevel 2>/dev/null"
-    if repo ~= "" then
-      repo = vim.fn.fnamemodify(repo, ":t")
-    end
-    local user = git "git config user.name 2>/dev/null"
-    local branch = git "git branch --show-current 2>/dev/null"
-
-    local btns = {}
-
-    -- ── Git info (clean, no icons) ──
-    table.insert(btns, { txt = " ", hl = "NvDashFooter", no_gap = true, rep = true })
-    if repo ~= "" then
-      local line = branch ~= "" and ("  " .. repo .. " (" .. branch .. ")") or ("  " .. repo)
-      table.insert(btns, { txt = line, hl = "NvDashFooter", no_gap = true, content = "fit" })
-    end
-    if user ~= "" then
-      table.insert(btns, { txt = "  " .. user, hl = "Comment", no_gap = true, content = "fit" })
-    end
-    table.insert(btns, { txt = " ", hl = "NvDashFooter", no_gap = true, rep = true })
-
-    -- ── Action buttons ──
-    vim.list_extend(btns, {
-      { txt = "  Find File", keys = "ff", cmd = "Telescope find_files" },
-      { txt = "  Recent Files", keys = "fo", cmd = "Telescope oldfiles" },
-      { txt = "  Find Word", keys = "fw", cmd = "Telescope live_grep" },
-      { txt = "  Themes", keys = "th", cmd = ":lua require('nvchad.themes').open()" },
-      { txt = "  Mappings", keys = "ch", cmd = "NvCheatsheet" },
-    })
-
-    return btns
-  end,
-}
 M.ui = {
-  -- statusline se delega a lualine.nvim (ver plugins/init.lua)
+  -- statusline se delega a lualine.nvim (ver plugins/ui/lualine.lua)
   statusline = { enabled = false },
   tabufline = { enabled = false },
 }
