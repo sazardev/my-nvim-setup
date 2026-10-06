@@ -327,6 +327,7 @@ return {
     "saghen/blink.cmp",
     version = "1.*", -- v2 (main) requiere blink.lib compilado con Rust
     event = "InsertEnter",
+    dependencies = { "rafamadriz/friendly-snippets" },
     opts = {
       -- Tab elige la opción de la lista, Enter la inserta (sin flechas)
       keymap = {
@@ -342,7 +343,17 @@ return {
         kind_icons = {},
       },
       sources = {
-        default = { "lsp", "path", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer" },
+        providers = {
+          -- flutter.json de friendly-snippets usa el language id "flutter",
+          -- que no es un filetype real de Neovim (siempre es "dart") — hay
+          -- que pedirlo explícito como extensión de "dart".
+          snippets = {
+            opts = {
+              extended_filetypes = { dart = { "flutter" } },
+            },
+          },
+        },
       },
       completion = {
         list = { selection = { preselect = false } },
