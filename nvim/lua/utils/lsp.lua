@@ -3,6 +3,7 @@
 -- buffer no tiene servidor (markdown, yaml...), el servidor aún arranca o no
 -- soporta el método. Aquí se explica en una línea qué pasa en cada caso.
 local log = require "utils.log"
+local nav = require "utils.navigation"
 
 local M = {}
 
@@ -53,11 +54,43 @@ local PICKER = {
   layout_config = { preview_height = 0.5, preview_cutoff = 1, mirror = false },
 }
 
---- Ir a la definición del símbolo bajo el cursor
+--- Opciones de picker que registran el salto de Enter para poder volver con <Esc>.
+---@param origin nav.Origin
+local function with_back(origin)
+  return vim.tbl_extend("force", PICKER, {
+    attach_mappings = function()
+      require("telescope.actions").select_default:enhance {
+        post = function()
+          nav.landed(origin)
+        end,
+      }
+      return true
+    end,
+  })
+end
+
+--- Ir a la definición del símbolo bajo el cursor. Un solo destino: salta y <Esc>
+--- vuelve; varios: quickfix (como el comportamiento por defecto).
 function M.goto_definition()
-  if supported("textDocument/definition", "ir a la definición") then
-    vim.lsp.buf.definition()
+  if not supported("textDocument/definition", "ir a la definición") then
+    return
   end
+
+  local origin = nav.origin()
+  vim.lsp.buf.definition {
+    on_list = function(result)
+      if #result.items == 0 then
+        return log.info(("No encuentro la definición de '%s'"):format(vim.fn.expand "<cword>"))
+      end
+      if #result.items > 1 then
+        vim.fn.setqflist({}, " ", result)
+        return vim.cmd "botright copen"
+      end
+      local client = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/definition" })[1]
+      vim.lsp.util.show_document(result.items[1].user_data, client.offset_encoding, { reuse_win = true, focus = true })
+      nav.landed(origin)
+    end,
+  }
 end
 
 --- Pregunta al servidor primero: si no hay resultados lo explica en una línea (el
@@ -94,12 +127,13 @@ function M.references()
   if not supported("textDocument/references", "buscar referencias") then
     return
   end
+  local origin = nav.origin()
   lookup(
     "textDocument/references",
     { context = { includeDeclaration = false } },
     "'%s' no se usa en ningún otro sitio",
     function()
-      require("telescope.builtin").lsp_references(vim.tbl_extend("force", PICKER, { include_declaration = false }))
+      require("telescope.builtin").lsp_references(vim.tbl_extend("force", with_back(origin), { include_declaration = false }))
     end
   )
 end

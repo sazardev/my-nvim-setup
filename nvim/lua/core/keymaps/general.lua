@@ -23,7 +23,30 @@ local function close_or_quit()
     return vim.cmd "confirm qa"
   end
 
-  require("nvchad.tabufline").close_buffer(cur)
+  -- tabufline de NvChad está desactivado (vim.t.bufs no existe): se cambia a otro
+  -- archivo listado y se borra el actual sin tocar las ventanas.
+  local alt = vim.fn.bufnr "#"
+  if alt == cur or alt < 1 or vim.fn.buflisted(alt) == 0 or vim.bo[alt].buftype ~= "" then
+    alt = nil
+    for _, b in ipairs(files) do
+      if b.bufnr ~= cur then
+        alt = b.bufnr
+        break
+      end
+    end
+  end
+
+  -- con cambios sin guardar, `confirm bdelete` pregunta primero y no se mueve nada antes
+  if alt and not vim.bo[cur].modified then
+    for _, win in ipairs(vim.fn.win_findbuf(cur)) do
+      vim.api.nvim_win_set_buf(win, alt)
+    end
+  end
+  -- sin `!`: pregunta si hay cambios sin guardar
+  local ok, err = pcall(vim.cmd, "confirm bdelete " .. cur)
+  if not ok and not err:find "Keyboard interrupt" then
+    vim.notify(err, vim.log.levels.WARN)
+  end
 end
 
 function M.setup()
@@ -34,7 +57,18 @@ function M.setup()
   map("n", "<leader>w", "<cmd>w<CR>", { desc = "save" })
   map("n", "<leader>q", close_or_quit, { desc = "close buffer / quit" })
 
-  -- CTRL+click → ir a definición (LSP); <C-o> vuelve atrás, <C-i> adelante
+  -- <Esc>: tras gd / grr / Ctrl+click vuelve a donde estabas (si no editaste ahí);
+  -- si no aplica, hace lo de NvChad (quitar el resaltado de búsqueda)
+  map("n", "<Esc>", function()
+    if not require("utils.navigation").back() then
+      vim.cmd "noh"
+    end
+  end, { desc = "volver tras saltar / quitar resaltado" })
+  map("n", "<leader>H", function()
+    require("utils.navigation").history_picker()
+  end, { desc = "historial de archivos (sesión)" })
+
+  -- CTRL+click → ir a definición (LSP); <Esc> o <C-o> vuelve atrás, <C-i> adelante
   map(
     "n",
     "<C-LeftMouse>",
