@@ -68,6 +68,14 @@ function M.setup()
     require("utils.navigation").history_picker()
   end, { desc = "historial de archivos (sesión)" })
 
+  -- Multicursor nativo (sin plugin): Ctrl+↓/↑ abre un bloque visual y lo extiende línea a
+  -- línea; luego `I` (insertar al inicio), `A` (al final), `c` (cambiar) o `$A` (fin de
+  -- cada línea) escriben en TODAS las líneas a la vez. <Esc> sale.
+  map("n", "<C-Down>", "<C-v>j", { desc = "multicursor: bloque hacia abajo" })
+  map("n", "<C-Up>", "<C-v>k", { desc = "multicursor: bloque hacia arriba" })
+  map("x", "<C-Down>", "j", { desc = "multicursor: extender hacia abajo" })
+  map("x", "<C-Up>", "k", { desc = "multicursor: extender hacia arriba" })
+
   -- CTRL+click → ir a definición (LSP); <Esc> o <C-o> vuelve atrás, <C-i> adelante
   map(
     "n",
