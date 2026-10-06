@@ -43,6 +43,19 @@ local defaults = {
     osc52 = "auto",
   },
 
+  -- Terminal integrada (toggleterm): la usan los menús por lenguaje y lazydocker.
+  -- position: "right" (panel lateral) | "bottom" | "float". Con menos de
+  -- `narrow_columns` columnas el panel lateral pasa abajo (no aplasta el código).
+  terminal = {
+    position = "right",
+    width = 0.38, -- fracción de las columnas (panel lateral)
+    min_width = 50,
+    height = 0.35, -- fracción de las líneas (panel inferior)
+    min_height = 8,
+    narrow_columns = 120,
+    float_scale = 0.85, -- fracción de la pantalla en modo float
+  },
+
   -- Linters que NO corren en InsertLeave (analizan todo el paquete: pesados)
   lint = {
     skip_insert_leave = { "go" },

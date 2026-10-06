@@ -36,10 +36,10 @@ local function script(name, fallback)
   return function()
     local pm, root = package_manager()
     if vim.tbl_contains(scripts(root), name) then
-      return terminal.float(("%s run %s"):format(pm, name), root)
+      return terminal.run(("%s run %s"):format(pm, name), root)
     end
     if fallback then
-      return terminal.float(fallback, root)
+      return terminal.run(fallback, root)
     end
     log.warn(("package.json no tiene el script `%s`"):format(name))
   end
@@ -53,7 +53,7 @@ local function pick_script()
   end
   vim.ui.select(names, { prompt = pm .. " run" }, function(choice)
     if choice then
-      terminal.float(("%s run %s"):format(pm, choice), root)
+      terminal.run(("%s run %s"):format(pm, choice), root)
     end
   end)
 end
@@ -61,7 +61,7 @@ end
 local function pm_command(sub)
   return function()
     local pm, root = package_manager()
-    terminal.float(pm .. " " .. sub, root)
+    terminal.run(pm .. " " .. sub, root)
   end
 end
 
@@ -77,7 +77,7 @@ return {
     "eslint --fix (archivo)",
     function()
       local _, root = package_manager()
-      terminal.float("npx --no-install eslint --fix " .. vim.fn.shellescape(vim.fn.expand "%:p"), root)
+      terminal.run("npx --no-install eslint --fix " .. vim.fn.shellescape(vim.fn.expand "%:p"), root)
     end,
   },
   { "f", "format", actions.format },

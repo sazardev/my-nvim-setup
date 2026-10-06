@@ -15,7 +15,7 @@ local function tool(flutter_sub, dart_sub)
     end
     local pubspec = project.read(root .. "/pubspec.yaml") or ""
     local is_flutter = pubspec:find "\n%s*flutter:" ~= nil
-    terminal.float(is_flutter and ("flutter " .. flutter_sub) or ("dart " .. dart_sub), root)
+    terminal.run(is_flutter and ("flutter " .. flutter_sub) or ("dart " .. dart_sub), root)
   end
 end
 

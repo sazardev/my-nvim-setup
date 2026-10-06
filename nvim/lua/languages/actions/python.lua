@@ -20,28 +20,28 @@ return {
     "r",
     "run archivo",
     function()
-      terminal.float((use_uv() and "uv run " or "python3 ") .. current_file(), project.root(MARKERS))
+      terminal.run((use_uv() and "uv run " or "python3 ") .. current_file(), project.root(MARKERS))
     end,
   },
   {
     "i",
     "REPL con el archivo",
     function()
-      terminal.float("python3 -i " .. current_file(), project.file_dir())
+      terminal.run("python3 -i " .. current_file(), project.file_dir())
     end,
   },
   {
     "m",
     "pytest",
     function()
-      terminal.float(use_uv() and "uv run pytest" or "python3 -m pytest", project.root(MARKERS))
+      terminal.run(use_uv() and "uv run pytest" or "python3 -m pytest", project.root(MARKERS))
     end,
   },
   {
     "t",
     "pytest (archivo)",
     function()
-      terminal.float("python3 -m pytest " .. current_file(), project.root(MARKERS))
+      terminal.run("python3 -m pytest " .. current_file(), project.root(MARKERS))
     end,
   },
   { "v", "ruff check", actions.run("ruff", "ruff check .", MARKERS) },
@@ -54,7 +54,7 @@ return {
         return log.warn "`ruff` no está instalado"
       end
       vim.cmd "silent write"
-      terminal.float("ruff format " .. current_file(), project.file_dir())
+      terminal.run("ruff format " .. current_file(), project.file_dir())
     end,
   },
 }

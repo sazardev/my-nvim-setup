@@ -17,14 +17,14 @@ end
 local function target(sub)
   return function()
     local dir, mod_root = paths()
-    terminal.float(("go %s %s"):format(sub, mod_root and "." or vim.fn.shellescape(vim.fn.expand "%:t")), dir)
+    terminal.run(("go %s %s"):format(sub, mod_root and "." or vim.fn.shellescape(vim.fn.expand "%:t")), dir)
   end
 end
 
 local function in_root(cmd)
   return function()
     local dir, mod_root = paths()
-    terminal.float(cmd, mod_root or dir)
+    terminal.run(cmd, mod_root or dir)
   end
 end
 
@@ -47,7 +47,7 @@ return {
       if not mod_root then
         return log.warn "No hay go.mod en el proyecto"
       end
-      terminal.float("go mod tidy", mod_root)
+      terminal.run("go mod tidy", mod_root)
     end,
   },
   { "x", "lint --fix", in_root "golangci-lint run --fix ./..." },

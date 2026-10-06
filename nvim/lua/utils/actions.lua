@@ -24,7 +24,7 @@ function M.run(bin, cmd, markers)
     if vim.fn.executable(bin) ~= 1 then
       return log.warn(("`%s` no está instalado"):format(bin))
     end
-    terminal.float(cmd, project.root(markers or { ".git" }))
+    terminal.run(cmd, project.root(markers or { ".git" }))
   end
 end
 

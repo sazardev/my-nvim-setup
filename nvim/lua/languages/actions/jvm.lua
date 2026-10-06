@@ -27,7 +27,7 @@ local function build_tool(goal)
     else
       cmd = ("%s %s"):format(project.has(root, "gradlew") and "./gradlew" or "gradle", goal.gradle)
     end
-    terminal.float(cmd, root)
+    terminal.run(cmd, root)
   end
 end
 
