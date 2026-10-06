@@ -14,7 +14,6 @@ return {
 
         -- Prefijos de NvChad que no queremos ver en el popup
         { "<leader>v", hidden = true },
-        { "<leader>q", hidden = true },
         { "<leader>wK", hidden = true },
         { "<leader>wk", hidden = true },
         { "<leader>c", hidden = true },
