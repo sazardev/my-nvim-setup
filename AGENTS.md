@@ -34,6 +34,8 @@ nvim/
     ├── languages/            # 1 archivo por lenguaje: DECLARA treesitter, lsp, mason, formatters, linters, menú
     │   ├── init.lua          #   registro: agrega las declaraciones y las sirve a cada consumidor
     │   └── actions/          #   acciones de los menús (go, dart, typescript, python, rust, jvm...)
+    ├── appearance/           # tema por defecto vs heredado de la terminal (Alacritty → base46)
+    ├── themes/               # temas de usuario de base46 (terminal.lua se genera de la paleta)
     ├── servers/              # overrides por servidor LSP (servers/<nombre>.lua) + cargador
     ├── menus/                # menús contextuales del leader (buffer-locales) + contexto Git
     ├── plugins/<grupo>/      # 1 spec de lazy por plugin: core lsp tools syntax languages navigation editing git ui
@@ -45,6 +47,8 @@ nvim/
 **Añadir un lenguaje**: crea `lua/languages/<nombre>.lua` (contrato en `languages/init.lua`) y agrégalo a `NAMES`. No hay que tocar mason, treesitter, conform, nvim-lint ni LSP: salen del registro. Overrides de un servidor: `lua/servers/<servidor>.lua`.
 
 **Añadir un plugin**: un archivo en `lua/plugins/<grupo>/`. Grupos nuevos: agrégalos a `GROUPS` en `core/lazy.lua`.
+
+**Tema heredado de la terminal** (`<leader>S`): lee `alacritty.toml` (Linux, Windows o WSL en `/mnt/*/Users/*/AppData`), resuelve sus `import` y genera un tema de base46 (`lua/themes/terminal.lua`) con el fondo exacto de la terminal, grises interpolados y acentos con contraste mínimo (`theme.terminal.min_contrast`). Se recuerda entre sesiones (estado en `stdpath("state")/appearance.json` + marcador junto a la caché de base46) y se sigue EN VIVO: mientras el tema activo es el terminal, un sondeo (`theme.terminal.watch_ms`, 1000 ms; 0 = apagado) hace `stat` de los archivos de la config y recompila al detectar un cambio (inotify no sirve: en WSL la config está en `/mnt/c`). Con el tema por defecto no corre nada. También re-sincroniza al abrir nvim y al volver el foco. Ruta personalizada: `theme.terminal.config`.
 
 **Ajustes por máquina**: `lua/local.lua` (ignorado por git) devuelve una tabla parcial que se mezcla sobre `core/settings.lua` (tema, lenguajes desactivados, format-on-save, opciones de vim, clipboard, modo ligero...). Ejemplo: `return { languages = { disabled = { "astro" } } }`.
 

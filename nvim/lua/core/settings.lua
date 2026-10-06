@@ -7,8 +7,17 @@
 --   return { theme = { name = "catppuccin" }, languages = { disabled = { "astro" } } }
 local defaults = {
   theme = {
+    -- Tema por defecto (el que vuelve al elegir "default" en <leader>S)
     name = "gruvbox",
     toggle = { "gruvbox", "gruvbox_light" },
+
+    -- Tema heredado de la terminal (Alacritty): ver lua/appearance/
+    terminal = {
+      enabled = true,
+      config = nil, -- ruta a alacritty.toml; nil = autodetección (Linux, Windows, WSL)
+      min_contrast = 3.0, -- contraste mínimo de los colores de acento contra el fondo
+      watch_ms = 1000, -- sondeo de la config de Alacritty para seguirla en vivo (0 = apagado)
+    },
   },
 
   -- Modo ligero (equipos de poca RAM): sin LSP residente ni go.nvim.

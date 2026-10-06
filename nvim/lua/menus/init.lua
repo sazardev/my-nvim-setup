@@ -11,6 +11,7 @@ local M = {}
 local function contexts()
   local list = require("languages").menus()
   table.insert(list, require "menus.git")
+  table.insert(list, require "menus.settings")
   return list
 end
 
@@ -34,10 +35,25 @@ local function bind(buf, ctx)
   end
 end
 
+--- Contexto global: se registra una sola vez, sin buffer
+---@param ctx table
+local function bind_global(ctx)
+  for _, m in ipairs(ctx.maps) do
+    vim.keymap.set("n", "<leader>" .. ctx.prefix .. m[1], m[3], { desc = m[2] })
+  end
+  local ok, wk = pcall(require, "which-key")
+  if ok then
+    wk.add { { "<leader>" .. ctx.prefix, group = ctx.name } }
+  end
+end
+
 ---@param ctx table
 ---@param buf integer
 ---@return boolean
 local function applies(ctx, buf)
+  if ctx.global then
+    return false
+  end
   if ctx.detect then
     return ctx.detect(buf)
   end
@@ -46,6 +62,12 @@ end
 
 function M.setup()
   local list = contexts()
+
+  for _, ctx in ipairs(list) do
+    if ctx.global then
+      bind_global(ctx)
+    end
+  end
 
   local function attach(buf)
     for _, ctx in ipairs(list) do

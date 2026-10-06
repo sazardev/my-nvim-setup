@@ -8,7 +8,7 @@ local settings = require "core.settings"
 local M = {}
 
 M.base46 = {
-  theme = settings.theme.name,
+  theme = require("appearance").initial(), -- último tema elegido (o el default)
   theme_toggle = settings.theme.toggle,
   hl_override = require("ui.highlights").overrides(),
 }

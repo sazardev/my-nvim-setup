@@ -55,15 +55,17 @@ return {
     opts.options.theme = theme.build()
     require("lualine").setup(opts)
 
-    -- Re-aplica el tema si NvChad recarga colores (p. ej. theme_toggle)
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      group = vim.api.nvim_create_augroup("LualineNvChadTheme", { clear = true }),
-      callback = function()
-        local ok, lualine = pcall(require, "lualine")
-        if ok then
-          lualine.setup { options = { theme = theme.build() } }
-        end
-      end,
-    })
+    -- Re-aplica el tema cuando NvChad recarga colores (theme_toggle, <leader>S...)
+    local function retheme()
+      local ok, lualine = pcall(require, "lualine")
+      if ok then
+        opts.options.theme = theme.build()
+        lualine.setup(opts) -- config completa: setup parcial perdería las secciones
+      end
+    end
+
+    local group = vim.api.nvim_create_augroup("LualineNvChadTheme", { clear = true })
+    vim.api.nvim_create_autocmd("ColorScheme", { group = group, callback = retheme })
+    vim.api.nvim_create_autocmd("User", { group = group, pattern = "NvThemeReload", callback = retheme })
   end,
 }

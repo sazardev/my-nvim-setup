@@ -43,6 +43,17 @@ El popup de `<leader>` muestra solo lo que aplica al archivo actual (keymaps buf
 | `<leader>j` / `<leader>k` | Java / Kotlin | `r` run, `b` build, `m` test, `v` check/verify, `c` clean (Gradle o Maven) |
 | `<leader>G` | Cualquier archivo dentro de un repo git | `t` status, `b` blame toggle |
 
+### Settings (`<leader>S`, global)
+
+| Key | Action |
+|-----|--------|
+| `<leader>St` | Alternar tema: default (gruvbox) ↔ heredado de la terminal (Alacritty) |
+| `<leader>Sd` | Tema por defecto |
+| `<leader>Sa` | Tema de la terminal |
+| `<leader>Sr` | Re-sincronizar la paleta de la terminal |
+| `<leader>Sp` | Selector de temas de NvChad |
+| `<leader>Si` | Info del tema activo |
+
 ### Globales
 
 | Key | Action |
