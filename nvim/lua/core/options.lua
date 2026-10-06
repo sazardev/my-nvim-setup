@@ -15,9 +15,6 @@ function M.setup()
 
   -- Flotantes limpios (sin bordes chillones)
   vim.o.winhighlight = "NormalFloat:Normal,FloatBorder:Comment,FloatTitle:Comment"
-
-  -- maplocalleader = space (mappings buffer-locales de LSP)
-  vim.g.maplocalleader = " "
 end
 
 return M

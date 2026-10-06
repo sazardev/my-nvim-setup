@@ -34,8 +34,13 @@ function M.setup()
   map("n", "<leader>w", "<cmd>w<CR>", { desc = "save" })
   map("n", "<leader>q", close_or_quit, { desc = "close buffer / quit" })
 
-  -- CTRL+click → ir a definición (LSP)
-  map("n", "<C-LeftMouse>", "<LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>", { desc = "Go to definition" })
+  -- CTRL+click → ir a definición (LSP); <C-o> vuelve atrás, <C-i> adelante
+  map(
+    "n",
+    "<C-LeftMouse>",
+    require("utils.lsp").goto_definition_at_mouse,
+    { desc = "ir a donde se DEFINE (Ctrl+click)" }
+  )
 end
 
 return M

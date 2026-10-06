@@ -76,4 +76,5 @@ El popup de `<leader>` muestra solo lo que aplica al archivo actual (keymaps buf
 | `<leader>ot` | Toggle task list |
 | `;` | Command mode |
 | `jk` | Escape (insert mode) |
-| `<C-LeftMouse>` | Go to definition |
+| `gd` / `<C-LeftMouse>` | **Ir a donde se define** el símbolo (Ctrl+click como en VS Code). `<C-o>` vuelve, `<C-i>` avanza |
+| `grr` | **Ver dónde se usa** el símbolo: lista con vista previa (por LSP, no es búsqueda de texto). Escribe para filtrar, `↑↓` / `<C-n>` `<C-p>` para moverte, `Enter` salta, `<C-q>` manda la lista a quickfix |

@@ -22,6 +22,14 @@ function M.setup()
         buffer = args.buf,
         desc = "LSP code action",
       })
+      -- Navegación con mensajes claros y selector de Telescope. grr es la tecla
+      -- estándar de Neovim 0.11+ (por defecto abre quickfix)
+      local lsp = require "utils.lsp"
+      local function nav(lhs, fn, desc)
+        vim.keymap.set("n", lhs, fn, { buffer = args.buf, desc = "LSP " .. desc })
+      end
+      nav("gd", lsp.goto_definition, "gd: ir a donde se DEFINE")
+      nav("grr", lsp.references, "grr: ver DÓNDE SE USA (lista)")
       label_rename_group(args.buf)
     end,
   })
