@@ -5,9 +5,11 @@ Neovim + NvChad v2.5 config — not an application. No tests, CI, or build syste
 ## Repo structure
 
 - `nvim/` — mirrors `%LOCALAPPDATA%\nvim` on Windows. Symlink it:
+
   ```powershell
   New-Item -ItemType Junction -Path "$env:LOCALAPPDATA\nvim" -Target "C:\path\to\my-nvim-setup\nvim"
   ```
+
 - `.agents/skills/caveman*` — OpenCode skills (lockfile: `skills-lock.json`)
 - `.gitignore` — excludes `.claude/` (machine-specific Claude config)
 
@@ -39,7 +41,7 @@ nvim/
     ├── servers/              # overrides por servidor LSP (servers/<nombre>.lua) + cargador
     ├── menus/                # menús contextuales del leader (buffer-locales) + contexto Git
     ├── plugins/<grupo>/      # 1 spec de lazy por plugin: core lsp tools syntax languages navigation editing git ui
-    ├── ui/                   # dashboard, highlights, lualine (tema + componentes)
+    ├── ui/                   # dashboard (+ arts/: catálogo de arte ASCII), highlights, lualine
     ├── utils/                # helpers puros: terminal, project, actions, git, log, telescope
     └── chadrc.lua            # solo compone: tema + dashboard + ui de NvChad
 ```
@@ -48,22 +50,24 @@ nvim/
 
 **Añadir un plugin**: un archivo en `lua/plugins/<grupo>/`. Grupos nuevos: agrégalos a `GROUPS` en `core/lazy.lua`.
 
+**Añadir un arte al dashboard**: crea `lua/ui/arts/<nombre>.lua` (devuelve la lista de líneas; **solo arte de puntos braille**, U+2800–U+28FF, nada de ASCII/bloques). Se descubre solo: `ui/arts/init.lua` escanea la carpeta, sin lista que mantener. Se elige desde el botón "Change Art" (`ca`) del dashboard; la elección se guarda en `stdpath("state")/dashboard.json`. Valor inicial: `settings.dashboard.art`.
+
 **Tema heredado de la terminal** (`<leader>S`): lee `alacritty.toml` (Linux, Windows o WSL en `/mnt/*/Users/*/AppData`), resuelve sus `import` y genera un tema de base46 (`lua/themes/terminal.lua`) con el fondo exacto de la terminal, grises interpolados y acentos con contraste mínimo (`theme.terminal.min_contrast`). Se recuerda entre sesiones (estado en `stdpath("state")/appearance.json` + marcador junto a la caché de base46) y se sigue EN VIVO: mientras el tema activo es el terminal, un sondeo (`theme.terminal.watch_ms`, 1000 ms; 0 = apagado) hace `stat` de los archivos de la config y recompila al detectar un cambio (inotify no sirve: en WSL la config está en `/mnt/c`). Con el tema por defecto no corre nada. También re-sincroniza al abrir nvim y al volver el foco. Ruta personalizada: `theme.terminal.config`.
 
 **Ajustes por máquina**: `lua/local.lua` (ignorado por git) devuelve una tabla parcial que se mezcla sobre `core/settings.lua` (tema, lenguajes desactivados, format-on-save, opciones de vim, clipboard, modo ligero...). Ejemplo: `return { languages = { disabled = { "astro" } } }`.
 
 ## Key tools included
 
-| Category | Tools |
-|----------|-------|
-| LSP | gopls, vtsls, tailwindcss, eslint, jsonls+schemastore, prismals, dockerls, astro |
-| Formatters | stylua, goimports+gofumpt, prettier, dart_format |
-| Linters | golangci-lint (govet in light mode), eslint_d, markdownlint, jsonlint, ysc (YarnSpinner) |
-| Completion | blink.cmp, mini.pairs |
-| Terminal | toggleterm, lazydocker (via TermExec) |
-| Navigation | harpoon (<leader>h*), flash.nvim (s/S), aerial (symbol outline), nvim-ufo (folds) |
-| UI | lualine, gitsigns, vim-illuminate, render-markdown, todo-comments, nvim-highlight-colors (hex/rgb/Tailwind preview) |
-| Other | Telescope+fzf-native, nvim-tree, Trouble, autotag, git-blame, grug-far (<leader>fr global replace), mini.surround, mini.move (Alt+hjkl), neoconf, package-info |
+| Category   | Tools                                                                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LSP        | gopls, vtsls, tailwindcss, eslint, jsonls+schemastore, prismals, dockerls, astro                                                                               |
+| Formatters | stylua, goimports+gofumpt, prettier, dart_format                                                                                                               |
+| Linters    | golangci-lint (govet in light mode), eslint_d, markdownlint, jsonlint, ysc (YarnSpinner)                                                                       |
+| Completion | blink.cmp, mini.pairs                                                                                                                                          |
+| Terminal   | toggleterm, lazydocker (via TermExec)                                                                                                                          |
+| Navigation | harpoon (<leader>h*), flash.nvim (s/S), aerial (symbol outline), nvim-ufo (folds)                                                                              |
+| UI         | lualine, gitsigns, vim-illuminate, render-markdown, todo-comments, nvim-highlight-colors (hex/rgb/Tailwind preview)                                            |
+| Other      | Telescope+fzf-native, nvim-tree, Trouble, autotag, git-blame, grug-far (<leader>fr global replace), mini.surround, mini.move (Alt+hjkl), neoconf, package-info |
 
 ## Performance
 

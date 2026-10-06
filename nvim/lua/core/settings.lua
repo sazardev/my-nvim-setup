@@ -20,6 +20,12 @@ local defaults = {
     },
   },
 
+  -- Dashboard: arte ASCII inicial (ver lua/ui/arts/): un nombre del catálogo.
+  -- El que se elige desde el dashboard ("Change Art") tiene prioridad.
+  dashboard = {
+    art = "hornet",
+  },
+
   -- Modo ligero (equipos de poca RAM): sin LSP residente ni go.nvim.
   -- `force`: true/false fuerza el modo; nil = autodetección por RAM.
   -- La variable de entorno NVIM_LIGHT=1|0 tiene prioridad sobre esto.

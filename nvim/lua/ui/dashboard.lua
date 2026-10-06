@@ -1,20 +1,7 @@
 -- ── Dashboard (nvdash de NvChad) ─────────────────────────────────────────────
--- Separado en: header (arte), info de git y botones de acción. Cada parte es
+-- Separado en: header (arte, ver ui/arts), info de git y botones de acción. Cada parte es
 -- una función/tabla independiente; `buttons()` solo las compone.
 local M = {}
-
-M.header = {
-  "⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡲⠃⡰⣆⠀⠀",
-  "⠀⠀⠀⠀⠀⠀⠀⢀⡔⢡⠮⡠⠊⣰⠂⠀⠀",
-  "⠀⠀⠀⠀⠀⠀⢀⠎⠠⡧⠊⠀⡠⠁⠀⠀⠀",
-  "⠀⠀⠀⠀⠀⠀⡘⠀⠀⠀⠀⡔⠃⠀⠀⠀⠀",
-  "⠀⠀⠀⠀⠀⠀⣯⣃⣾⡧⠊⠀⠀⠀⠀⠀⠀",
-  "⠀⠀⠀⠀⠀⠀⢀⣿⣿⣥⠀⠀⠀⣀⣤⠾⠷",
-  "⠀⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⣶⡿⠋⠉⠀⠀",
-  "⠀⠀⠀⠀⠈⣻⠿⣿⣿⣿⡿⠛⠃⠀⠀⠀⠀",
-  "⠀⠀⣤⣔⠎⠇⠙⠀⢧⢸⠀⠀⠀⠀⠀⠀⠀",
-  "⠐⠊⠁⠁⠀⠀⠀⠀⠸⢸⠀⠀⠀⠀⠀⠀⠀",
-}
 
 --- Acciones: { texto, atajo, comando }
 local ACTIONS = {
@@ -23,6 +10,7 @@ local ACTIONS = {
   { "  Find Word", "fw", "Telescope live_grep" },
   { "  Themes", "th", ":lua require('nvchad.themes').open()" },
   { "  Mappings", "ch", "NvCheatsheet" },
+  { "  Change Art", "ca", "lua require('ui.arts').pick()" },
 }
 
 local function separator()
@@ -66,7 +54,7 @@ end
 function M.config()
   return {
     load_on_startup = true,
-    header = M.header,
+    header = require("ui.arts").lines,
     buttons = M.buttons,
   }
 end
