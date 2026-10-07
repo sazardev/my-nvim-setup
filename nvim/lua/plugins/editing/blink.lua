@@ -20,7 +20,10 @@ return {
     },
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
+      -- lazydev solo existe en archivos Lua (completa require() y módulos de plugins)
+      per_filetype = { lua = { "lazydev", "lsp", "path", "snippets", "buffer" } },
       providers = {
+        lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
         -- flutter.json de friendly-snippets usa el language id "flutter", que no
         -- es un filetype real de Neovim (siempre es "dart"): se pide explícito.
         snippets = {

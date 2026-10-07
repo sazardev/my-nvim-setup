@@ -14,5 +14,13 @@ return {
 		{ "f", "history of this file", ex("DiffviewFileHistory %") },
 		{ "r", "history of the repo", ex("DiffviewFileHistory") },
 		{ "q", "close Diffview", ex("DiffviewClose") },
+		-- conflictos de merge (git-conflict.nvim)
+		{ "o", "conflict: keep ours", ex("GitConflictChooseOurs") },
+		{ "T", "conflict: keep theirs", ex("GitConflictChooseTheirs") },
+		{ "B", "conflict: keep both", ex("GitConflictChooseBoth") },
+		{ "N", "conflict: keep none", ex("GitConflictChooseNone") },
+		{ "n", "conflict: next", ex("GitConflictNextConflict") },
+		{ "p", "conflict: previous", ex("GitConflictPrevConflict") },
+		{ "l", "conflicts of the repo (quickfix)", ex("GitConflictListQf") },
 	},
 }

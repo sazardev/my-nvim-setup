@@ -67,7 +67,7 @@ nvim/
 | Terminal   | toggleterm, lazydocker (via TermExec)                                                                                                                          |
 | Navigation | harpoon (<leader>h*), flash.nvim (s/S), aerial (symbol outline), nvim-ufo (folds)                                                                              |
 | UI         | lualine, gitsigns, treesitter-context (`:TSContext toggle`), vim-illuminate, render-markdown, todo-comments, nvim-highlight-colors (hex/rgb/Tailwind preview)                                            |
-| Other      | Telescope+fzf-native, nvim-tree, Trouble, autotag, git-blame, grug-far (<leader>fr global replace), diffview (<leader>Gd diff, <leader>Gf/Gr historial), mini.surround, mini.move (Alt+hjkl), neoconf, package-info, persistence (sesiones) |
+| Other      | lazydev (tipos de la API de nvim en Lua), git-conflict (<leader>Go/GT/GB/GN/Gn/Gp/Gl), Telescope+fzf-native, nvim-tree, Trouble, autotag, git-blame, grug-far (<leader>fr global replace), diffview (<leader>Gd diff, <leader>Gf/Gr historial), mini.surround, mini.move (Alt+hjkl), neoconf, package-info, persistence (sesiones) |
 
 ## Performance
 
@@ -86,6 +86,8 @@ nvim/
 - **`:checkhealth mason`** avisa de ruby/gem/php/java/julia/composer/luarocks ausentes: es solo informativo, ningún tool de la config los necesita
 - **Menús contextuales del leader** (`lua/menus/` + campo `menu` de cada lenguaje): cada lenguaje tiene su letra y solo existe en buffers de ese filetype (g Go, d Dart, r Rust, p Python, t TS/JS, m Markdown, s CSS, j Java, k Kotlin); `<leader>G` Git solo dentro de un repo. Para añadir un lenguaje: nueva entrada en la tabla `langs`. No definas un mapeo que sea a la vez acción y prefijo de otros (p. ej. `<leader>h` + `<leader>h1`): which-key lo resuelve tras `timeoutlen` y cierra el popup
 - **Sesiones** (`persistence.nvim`, `utils/session.lua`, menú global `<leader>P`): guarda buffers y ventanas al salir, una por carpeta (y por rama de git; `main`/`master` usan la base). NO se restauran solas: botón "Restore Session" (`rs`) del dashboard (solo si hay sesión para esa carpeta) o `<leader>Pr`; `<leader>Ps` elige proyecto, `<leader>Pl` la última, `<leader>Pw` guarda ya, `<leader>Px` no guarda al salir. Antes de guardar se cierran las ventanas auxiliares (árbol, terminal, outline). Abrir un solo archivo (`nvim x`) y salir sobrescribe la sesión de esa carpeta: usa `<leader>Px` si no quieres. Qué incluye: `options.sessionoptions` en `core/settings.lua`. El deshacer persistente (`undofile`) ya lo activa NvChad
+- **Autoread** (`core/autocmds/autoread.lua`): `autoread` + `checktime` en `FocusGained`/`TermClose`/`TermLeave` recargan lo que cambian git o los formatters fuera de nvim (nunca pisa buffers con cambios sin guardar). Búsqueda con `ignorecase`+`smartcase` e `inccommand=split` (vista previa de `:s`) en `options`
+- **git-conflict.nvim**: sin mapeos por defecto (`co`/`cb` pisarían operadores `c`); las acciones viven en el menú `<leader>G` (o ours, T theirs, B both, N none, n/p siguiente/anterior, l lista en quickfix)
 - **Treesitter** compila parsers con el compilador de C del sistema (`gcc`) y requiere el binario `tree-sitter` (`tree-sitter-cli`)
 - **No standalone run**: this is a config repo, must be symlinked to Neovim's config path
 - **lazy-lock.json** committed for reproducible plugin versions
