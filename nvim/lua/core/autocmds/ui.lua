@@ -10,6 +10,21 @@ function M.setup()
       vim.o.cmdheight = 0
     end,
   })
+
+  -- El dashboard (nvdash) se redibuja al redimensionar poniendo `modifiable = true` y
+  -- nunca lo vuelve a bloquear (bug de NvChad): se podía escribir texto en él. Se
+  -- re-bloquea justo después de su redibujado.
+  vim.api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
+    group = vim.api.nvim_create_augroup("RelockNvdash", { clear = true }),
+    callback = function()
+      vim.schedule(function()
+        local buf = vim.g.nvdash_buf
+        if buf and vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype == "nvdash" then
+          vim.bo[buf].modifiable = false
+        end
+      end)
+    end,
+  })
 end
 
 return M
