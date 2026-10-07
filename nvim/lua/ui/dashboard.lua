@@ -35,9 +35,14 @@ end
 
 ---@return table[]
 local function action_buttons()
+  local actions = vim.list_slice(ACTIONS)
+  -- solo si esta carpeta tiene una sesión guardada (ver utils/session.lua)
+  if require("utils.session").exists() then
+    table.insert(actions, 1, { "  Restore Session", "rs", "lua require('utils.session').restore()" })
+  end
   return vim.tbl_map(function(action)
     return { txt = action[1], keys = action[2], cmd = action[3] }
-  end, ACTIONS)
+  end, actions)
 end
 
 ---@return table[]

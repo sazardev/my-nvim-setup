@@ -12,6 +12,7 @@ local function contexts()
   local list = require("languages").menus()
   table.insert(list, require "menus.git")
   table.insert(list, require "menus.settings")
+  table.insert(list, require "menus.session")
   return list
 end
 

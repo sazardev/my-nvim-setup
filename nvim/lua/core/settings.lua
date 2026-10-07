@@ -98,6 +98,8 @@ local defaults = {
     signcolumn = "yes:1",
     jumpoptions = "view", -- <C-o>/<C-i> restauran también la vista (scroll), no solo el cursor
     exrc = true, -- carga .nvim.lua por proyecto (protegido por :trust)
+    -- Qué guarda una sesión (persistence.nvim); sin `terminal`/`blank`: no se restauran
+    sessionoptions = "buffers,curdir,tabpages,winsize,help,globals,skiprtp,folds",
   },
 }
 
