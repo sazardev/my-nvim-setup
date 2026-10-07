@@ -11,6 +11,8 @@ function M.setup()
     vim.o[name] = value
   end
 
+  vim.diagnostic.config(settings.diagnostics)
+
   vim.opt.shortmess:append "c" -- silencia mensajes de completado
 
   -- Flotantes limpios (sin bordes chillones)

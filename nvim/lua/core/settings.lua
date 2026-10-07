@@ -67,6 +67,12 @@ local defaults = {
     skip_insert_leave = { "go" },
   },
 
+  -- vim.diagnostic.config(...): cómo se muestran los errores del LSP/linters
+  diagnostics = {
+    severity_sort = true, -- el error se ve antes que el aviso en la misma línea
+    update_in_insert = false, -- sin errores a medias mientras se escribe
+  },
+
   -- vim.o.<clave> = valor
   options = {
     cmdheight = 0,
@@ -90,6 +96,7 @@ local defaults = {
     cursorline = true,
     cursorlineopt = "number",
     signcolumn = "yes:1",
+    jumpoptions = "view", -- <C-o>/<C-i> restauran también la vista (scroll), no solo el cursor
     exrc = true, -- carga .nvim.lua por proyecto (protegido por :trust)
   },
 }
