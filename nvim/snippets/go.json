@@ -1,0 +1,256 @@
+{
+  "iferr": {
+    "prefix": [
+      "iferr"
+    ],
+    "body": [
+      "if err != nil {",
+      "\treturn ${1:err}",
+      "}"
+    ],
+    "description": "if err != nil { return err }"
+  },
+  "errors.Is": {
+    "prefix": [
+      "errorsis"
+    ],
+    "body": [
+      "if errors.Is(err, ${1:ErrNotFound}) {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "errors.Is"
+  },
+  "errors.As": {
+    "prefix": [
+      "errorsas"
+    ],
+    "body": [
+      "var ${1:target} *${2:MyError}",
+      "if errors.As(err, &$1) {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "errors.As"
+  },
+  "sentinel error": {
+    "prefix": [
+      "errorsentinel"
+    ],
+    "body": "var Err${1:NotFound} = errors.New(\"${2:not found}\")",
+    "description": "var ErrX = errors.New(...)"
+  },
+  "context with timeout": {
+    "prefix": [
+      "contexttimeout"
+    ],
+    "body": [
+      "ctx, cancel := context.WithTimeout(${1:ctx}, ${2:5 * time.Second})",
+      "defer cancel()"
+    ],
+    "description": "context.WithTimeout + defer cancel"
+  },
+  "context with cancel": {
+    "prefix": [
+      "contextcancel"
+    ],
+    "body": [
+      "ctx, cancel := context.WithCancel(${1:ctx})",
+      "defer cancel()"
+    ],
+    "description": "context.WithCancel + defer cancel"
+  },
+  "waitgroup": {
+    "prefix": [
+      "waitgroup"
+    ],
+    "body": [
+      "var wg sync.WaitGroup",
+      "for ${1:_, v} := range ${2:items} {",
+      "\twg.Add(1)",
+      "\tgo func() {",
+      "\t\tdefer wg.Done()",
+      "\t\t${0}",
+      "\t}()",
+      "}",
+      "wg.Wait()"
+    ],
+    "description": "sync.WaitGroup over a range"
+  },
+  "errgroup": {
+    "prefix": [
+      "errgroup"
+    ],
+    "body": [
+      "g, ctx := errgroup.WithContext(${1:ctx})",
+      "g.Go(func() error {",
+      "\t${0}",
+      "\treturn nil",
+      "})",
+      "if err := g.Wait(); err != nil {",
+      "\treturn err",
+      "}"
+    ],
+    "description": "errgroup"
+  },
+  "mutex": {
+    "prefix": [
+      "mutex"
+    ],
+    "body": [
+      "${1:mu}.Lock()",
+      "defer $1.Unlock()"
+    ],
+    "description": "Lock + defer Unlock"
+  },
+  "sync.Once": {
+    "prefix": [
+      "once"
+    ],
+    "body": [
+      "${1:once}.Do(func() {",
+      "\t${0}",
+      "})"
+    ],
+    "description": "sync.Once.Do"
+  },
+  "select with ctx": {
+    "prefix": [
+      "selectcontext"
+    ],
+    "body": [
+      "select {",
+      "case <-ctx.Done():",
+      "\treturn ctx.Err()",
+      "case ${1:v} := <-${2:ch}:",
+      "\t${0}",
+      "}"
+    ],
+    "description": "select with ctx.Done()"
+  },
+  "range with index": {
+    "prefix": [
+      "forrangeindex"
+    ],
+    "body": [
+      "for ${1:i}, ${2:v} := range ${3:items} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "for i, v := range"
+  },
+  "range int": {
+    "prefix": [
+      "forrangeint"
+    ],
+    "body": [
+      "for ${1:i} := range ${2:n} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "for i := range n (Go 1.22+)"
+  },
+  "subtest": {
+    "prefix": [
+      "testsubtest"
+    ],
+    "body": [
+      "t.Run(\"${1:name}\", func(t *testing.T) {",
+      "\t${0}",
+      "})"
+    ],
+    "description": "t.Run"
+  },
+  "table test": {
+    "prefix": [
+      "testtable"
+    ],
+    "body": [
+      "func Test${1:Name}(t *testing.T) {",
+      "\ttests := []struct {",
+      "\t\tname string",
+      "\t\t${2:in}   ${3:string}",
+      "\t\twant ${4:string}",
+      "\t}{",
+      "\t\t{name: \"${5:case}\", $2: ${6:\"\"}, want: ${7:\"\"}},",
+      "\t}",
+      "\tfor _, tt := range tests {",
+      "\t\tt.Run(tt.name, func(t *testing.T) {",
+      "\t\t\tgot := ${8:fn}(tt.$2)",
+      "\t\t\tif got != tt.want {",
+      "\t\t\t\tt.Errorf(\"got %v, want %v\", got, tt.want)",
+      "\t\t\t}",
+      "\t\t})",
+      "\t}",
+      "}"
+    ],
+    "description": "table-driven test with subtests"
+  },
+  "test helper": {
+    "prefix": [
+      "testhelper"
+    ],
+    "body": [
+      "func ${1:helper}(t *testing.T${2}) {",
+      "\tt.Helper()",
+      "\t${0}",
+      "}"
+    ],
+    "description": "test helper (t.Helper)"
+  },
+  "http handler json": {
+    "prefix": [
+      "httphandlerjson"
+    ],
+    "body": [
+      "func (${1:h} *${2:Handler}) ${3:Get}(w http.ResponseWriter, r *http.Request) {",
+      "\tw.Header().Set(\"Content-Type\", \"application/json\")",
+      "\tif err := json.NewEncoder(w).Encode(${4:resp}); err != nil {",
+      "\t\thttp.Error(w, err.Error(), http.StatusInternalServerError)",
+      "\t}",
+      "}"
+    ],
+    "description": "HTTP handler that responds with JSON"
+  },
+  "json decode body": {
+    "prefix": [
+      "jsondecodebody"
+    ],
+    "body": [
+      "var ${1:req} ${2:Request}",
+      "if err := json.NewDecoder(r.Body).Decode(&$1); err != nil {",
+      "\thttp.Error(w, err.Error(), http.StatusBadRequest)",
+      "\treturn",
+      "}"
+    ],
+    "description": "decode the JSON request body"
+  },
+  "slog": {
+    "prefix": [
+      "slog"
+    ],
+    "body": "slog.${1|Info,Error,Warn,Debug|}(\"${2:message}\", \"${3:key}\", ${4:value})",
+    "description": "log/slog"
+  },
+  "defer func": {
+    "prefix": [
+      "deferfunc"
+    ],
+    "body": [
+      "defer func() {",
+      "\t${0}",
+      "}()"
+    ],
+    "description": "defer func() {}()"
+  },
+  "go:embed": {
+    "prefix": [
+      "embed"
+    ],
+    "body": [
+      "//go:embed ${1:file.txt}",
+      "var ${2:content} string"
+    ],
+    "description": "//go:embed"
+  }
+}

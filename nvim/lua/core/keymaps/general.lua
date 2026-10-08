@@ -57,9 +57,27 @@ function M.setup()
   map("n", "<leader>w", "<cmd>w<CR>", { desc = "save" })
   map("n", "<leader>q", close_or_quit, { desc = "close buffer / quit" })
 
-  -- <Esc>: tras gd / grr / Ctrl+click vuelve a donde estabas (si no editaste ahí);
+  -- <leader>d: borrar SIN copiar (registro "_"): el portapapeles queda intacto.
+  -- Visual: <leader>d | Normal: <leader>dd (línea), <leader>dw (palabra), etc.
+  map({ "n", "v" }, "<leader>d", '"_d', { desc = "delete (don't copy)" })
+
+  -- Diagnóstico de la línea actual en un popup (como el hover de las docs); pulsarlo
+  -- otra vez entra al popup para copiar o hacer scroll
+  local diag_win
+  map("n", "<leader>xd", function()
+    local _, win = vim.diagnostic.open_float { border = "single", source = true }
+    diag_win = win
+  end, { desc = "Line diagnostic (popup)" })
+
+  -- <Esc>: primero cierra el popup de diagnóstico si está abierto; luego, tras
+  -- gd / grr / Ctrl+click vuelve a donde estabas (si no editaste ahí);
   -- si no aplica, hace lo de NvChad (quitar el resaltado de búsqueda)
   map("n", "<Esc>", function()
+    if diag_win and vim.api.nvim_win_is_valid(diag_win) then
+      vim.api.nvim_win_close(diag_win, true)
+      diag_win = nil
+      return
+    end
     if not require("utils.navigation").back() then
       vim.cmd "noh"
     end

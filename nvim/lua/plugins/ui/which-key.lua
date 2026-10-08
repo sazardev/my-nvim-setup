@@ -11,6 +11,7 @@ return {
         { "<leader>f", group = "Find" },
         { "<leader>x", group = "Diagnostics" },
         { "<leader>h", group = "Harpoon" },
+        { "<leader>n", group = "Nvim-tree folders" },
 
         -- Prefijos de NvChad que no queremos ver en el popup
         { "<leader>v", hidden = true },
@@ -19,7 +20,6 @@ return {
         { "<leader>c", hidden = true },
         { "<leader>o", hidden = true },
         { "<leader>b", hidden = true },
-        { "<leader>n", hidden = true },
 
         -- Keymaps deshabilitados dentro de grupos visibles
         { "<leader>fa", hidden = true },

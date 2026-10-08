@@ -28,7 +28,23 @@ local function in_root(cmd)
   end
 end
 
+-- Comandos de go.nvim (no se carga en modo ligero)
+local function go_cmd(cmd)
+  return function()
+    if vim.fn.exists(":" .. cmd:match "^%S+") ~= 2 then
+      return log.warn "go.nvim is not loaded (light mode?)"
+    end
+    vim.cmd(cmd)
+  end
+end
+
 return {
+  { "a", "struct: add json tags", go_cmd "GoAddTag json" },
+  { "A", "struct: add json tags + omitempty", go_cmd "GoAddTag json -add-options json=omitempty" },
+  { "D", "struct: remove json tags", go_cmd "GoRmTag json" },
+  { "s", "struct: fill literal", go_cmd "GoFillStruct" },
+  { "e", "if err != nil (call)", go_cmd "GoIfErr" },
+  { "T", "add test (func)", go_cmd "GoAddTest" },
   { "r", "run", target "run" },
   { "b", "build", target "build" },
   {
@@ -52,4 +68,11 @@ return {
   },
   { "x", "lint --fix", in_root "golangci-lint run --fix ./..." },
   { "m", "test", in_root "go test ./..." },
+  { "R", "test -race", in_root "go test -race ./..." },
+  { "c", "test coverage", in_root "go test -cover ./..." },
+  -- go fix (modernizers del toolchain: any, rangeint, minmax, slices*, etc.)
+  { "p", "fix preview (diff)", in_root "go fix -diff ./..." },
+  { "i", "fix (apply modernizers)", in_root "go fix ./..." },
+  { "g", "generate", in_root "go generate ./..." },
+  { "u", "update deps + tidy", in_root "go get -u ./... && go mod tidy" },
 }

@@ -21,12 +21,33 @@ return {
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
       -- lazydev solo existe en archivos Lua (completa require() y módulos de plugins)
-      per_filetype = { lua = { "lazydev", "lsp", "path", "snippets", "buffer" } },
+      -- gotags solo en Go: tags de struct derivados del nombre del campo (utils/gotags.lua)
+      per_filetype = {
+        lua = { "lazydev", "lsp", "path", "snippets", "buffer" },
+        go = { "gotags", "gosmart", "lsp", "path", "snippets", "buffer" },
+      },
       providers = {
         lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
+        gotags = { name = "GoTags", module = "utils.gotags", score_offset = 100 },
+        -- constructor / struct{} según el contexto, y filtra snippets que no aplican (utils/gosmart.lua)
+        gosmart = { name = "GoSmart", module = "utils.gosmart", score_offset = 90 },
         -- flutter.json de friendly-snippets usa el language id "flutter", que no
         -- es un filetype real de Neovim (siempre es "dart"): se pide explícito.
+        -- al empezar una declaración en Go: sin palabras sueltas del buffer ni el func/type genérico del LSP
+        buffer = {
+          transform_items = function(ctx, items)
+            return require("utils.gosmart").quiet_buffer(ctx, items)
+          end,
+        },
+        lsp = {
+          transform_items = function(ctx, items)
+            return require("utils.gosmart").quiet_lsp(ctx, items)
+          end,
+        },
         snippets = {
+          transform_items = function(ctx, items)
+            return require("utils.gosmart").filter_snippets(ctx, items)
+          end,
           opts = {
             extended_filetypes = { dart = { "flutter" } },
           },
@@ -34,9 +55,17 @@ return {
       },
     },
     completion = {
-      list = { selection = { preselect = false } },
+      -- sin preselección, salvo dentro de un struct tag de Go (Enter acepta la sugerencia)
+      list = {
+        selection = {
+          preselect = function()
+            return require("utils.gotags").active()
+          end,
+        },
+      },
       documentation = {
         auto_show = true,
+        auto_show_delay_ms = 0, -- sin espera al seleccionar (por defecto 500 ms)
         window = { border = "single" },
       },
     },
@@ -47,5 +76,6 @@ return {
   },
   config = function(_, opts)
     require("blink.cmp").setup(opts)
+    require("utils.gosmart").autotrigger()
   end,
 }
