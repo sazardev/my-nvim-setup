@@ -148,6 +148,7 @@ function M.pick()
       finder = finders.new_table { results = names },
       sorter = conf.generic_sorter {},
       default_selection_index = (vim.fn.index(names, M.current()) + 1),
+      layout_strategy = "horizontal",
       layout_config = { width = 0.7, height = 0.6, preview_width = 0.6 },
       previewer = previewers.new_buffer_previewer {
         title = "Vista previa",
