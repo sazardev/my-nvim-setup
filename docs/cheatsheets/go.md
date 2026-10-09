@@ -113,6 +113,26 @@ func NewEnvelope(kind Kind, id string, sentAt time.Time) *Envelope {
 
 Los parámetros salen en lowerCamel (`UserID` → `userID`, `ID` → `id`). Los campos embebidos no entran.
 
+**`funcnew`** — constructor que devuelve `(*X, error)`. Es **opcional**: no sale en la lista hasta que tecleas `funcn…` (a nivel de paquete). Tab/Enter lo insertan:
+
+```go
+func New(id, title, content string) (*Note, error) {
+	|   // ← cursor aquí: validaciones (largos máximos, vacíos…)
+	now := time.Now().UTC()
+	return &Note{
+		id:        id,
+		title:     title,
+		content:   content,
+		createdAt: now,
+		updatedAt: now,
+	}, nil
+}
+```
+
+Los `time.Time` cuyo nombre empieza por `created`, `updated` o `modified` **no son parámetros**: salen de un único `now := time.Now().UTC()`. Cualquier otro `time.Time` (`dueDate`) o `*time.Time` sigue siendo parámetro. Sin campos de ese tipo no se genera `now`.
+
+Los parámetros contiguos del mismo tipo se agrupan. Con un solo struct en el archivo se llama `New`; con varios, `NewX` (y salen varias entradas: `funcnew Note`, `funcnew Other`…).
+
 **`type`** — variantes de tipo:
 
 | Opción | Genera |
@@ -191,6 +211,32 @@ El menú se abre **solo**, sin teclear nada, en tres momentos: al escribir `{` (
 ### Dentro de una función
 Salen los snippets de sentencia (abajo). Los de declaración se ocultan. Dentro de un struct no sale ninguno.
 
+## Declarar errores centinela (`goerrors`)
+
+Teclea solo el **nombre** del error: el resto aparece solo, en gris, y crece con cada letra (`utils/goerrors.lua`).
+
+```go
+ErrDescriptionTooLong|  →  ErrDescriptionTooLong = errors.New("description too long")
+```
+
+| Dónde | Tecleas | Se escribe |
+|---|---|---|
+| dentro de `var ( … )` | `ErrNotFound` | `ErrNotFound = errors.New("not found")` |
+| tras `var ` | `ErrInvalidID` | `ErrInvalidID = errors.New("invalid id")` |
+| nivel de paquete | `ErrEmptyTitle` | `var ErrEmptyTitle = errors.New("empty title")` |
+
+| Tecla | Acción |
+|---|---|
+| `Tab` | acepta el texto gris (cursor al final de la línea) |
+| `Enter` | lo acepta y abre línea nueva (ideal para seguir con el siguiente error del bloque) |
+| `Esc` | lo descarta |
+
+- Parte el nombre por mayúsculas y lo pasa a minúsculas (`TitleTooLong` → `title too long`, `HTTPError` → `http error`).
+- Acepta también nombres sin exportar (`errNotFound`). Necesita `Err` + mayúscula (`Error…` no dispara).
+- Solo sale con el cursor al final de la línea; mientras hay sugerencia no se abre el menú de completado.
+- El import de `errors` lo añade goimports al guardar.
+- Dentro de funciones no sale (ahí no se declaran centinelas).
+
 ## Snippets de sentencias (`nvim/snippets/go.json`)
 
 Nombres completos: se encuentran tecleando **cualquier parte** (`wrap` → `errorsis`…, `ctx` → los de context).
@@ -200,7 +246,7 @@ Nombres completos: se encuentran tecleando **cualquier parte** (`wrap` → `erro
 | `iferr` | `if err != nil { return err }` (el `err` queda seleccionado para cambiarlo; solo dentro de funciones) |
 | `errorsis` | `if errors.Is(err, ErrX) { … }` |
 | `errorsas` | `var t *MyError; if errors.As(err, &t) { … }` |
-| `errorsentinel` | `var ErrX = errors.New("…")` (solo a nivel de paquete) |
+| `errorsentinel` | `var ErrX = errors.New("…")` (solo a nivel de paquete; el mensaje derivado del nombre: ver arriba) |
 | `contexttimeout` | `ctx, cancel := context.WithTimeout(…)` + `defer cancel()` |
 | `contextcancel` | `context.WithCancel` + `defer cancel()` |
 | `waitgroup` | `sync.WaitGroup` sobre un range |
@@ -243,6 +289,7 @@ Los de declaración de friendly (`func`, `meth`, `tys`, `tyi`, `tyf`, `finit`, `
 | `lua/servers/gopls.lua` | ajustes de gopls |
 | `lua/utils/gotags.lua` | fuente blink: tags de struct |
 | `lua/utils/gosmart.lua` | fuente blink: func/type/métodos/constructor/interface + filtros |
+| `lua/utils/goerrors.lua` | texto fantasma de errores centinela (`ErrX` → `ErrX = errors.New("x")`); Tab/Enter se cablean en `blink.lua` |
 | `lua/plugins/editing/blink.lua` | registra las fuentes y filtros (buffer, lsp, snippets) |
 | `snippets/go.json` | snippets de sentencias |
 

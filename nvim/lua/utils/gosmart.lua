@@ -324,6 +324,66 @@ local function constructor_text(s)
   return ("%s\n\treturn &%s{\n%s\n\t}\n}"):format(head, s.name, table.concat(assigns, "\n"))
 end
 
+local FUNCNEW_MIN = 5 -- letras tecleadas (`funcn`) para que salga `funcnew`
+
+--- Escapa lo que el parser de snippets LSP interpreta (`$`, `}` y `\`)
+---@param text string
+---@return string
+local function snippet_escape(text)
+  return (text:gsub("[$}\\]", "\\%0"))
+end
+
+--- Campos `time.Time` que nacen con el objeto (createdAt, updatedAt, modifiedAt…): no son
+--- parámetros, se rellenan con un único `now`. El resto de `time.Time` (dueDate…) sí lo es.
+---@param f { name: string, type: string }
+---@return boolean
+local function is_now_field(f)
+  local n = f.name:lower()
+  return f.type == "time.Time" and (n:find "^created" or n:find "^updated" or n:find "^modified") ~= nil
+end
+
+--- `New` (o `NewX` si hay varios structs) con los campos y `(*X, error)`.
+--- Los parámetros contiguos del mismo tipo se agrupan: `id, title, content string`.
+--- Los `time.Time` de creación/actualización salen de `now := time.Now().UTC()`.
+--- `$0` queda antes del return, para las validaciones.
+---@param s GoStruct
+---@param single boolean # único struct del archivo → `New`
+---@return string
+local function constructor_error_text(s, single)
+  local groups, assigns, width, uses_now = {}, {}, 0, false
+  for _, f in ipairs(s.fields) do
+    width = math.max(width, #f.name)
+    if is_now_field(f) then
+      uses_now = true
+    else
+      local p = param_name(f.name)
+      local g = groups[#groups]
+      if g and g.type == f.type then
+        g.names[#g.names + 1] = p
+      else
+        groups[#groups + 1] = { names = { p }, type = f.type }
+      end
+    end
+  end
+  local params = {}
+  for i, g in ipairs(groups) do
+    params[i] = ("%s %s"):format(table.concat(g.names, ", "), g.type)
+  end
+  for _, f in ipairs(s.fields) do
+    local pad = (" "):rep(width - #f.name)
+    local value = is_now_field(f) and "now" or param_name(f.name)
+    assigns[#assigns + 1] = ("\t\t%s:%s %s,"):format(f.name, pad, value)
+  end
+  local name = single and "New" or "New" .. s.name
+  local head = ("func %s(%s) (*%s, error) {"):format(name, table.concat(params, ", "), s.name)
+  local body = (uses_now and "\n\tnow := time.Now().UTC()" or "")
+    .. (#assigns == 0 and ("\n\treturn &%s{}, nil"):format(s.name) or ("\n\treturn &%s{\n%s\n\t}, nil"):format(
+      s.name,
+      table.concat(assigns, "\n")
+    ))
+  return snippet_escape(head .. "\n\t") .. "$0" .. snippet_escape(body .. "\n}")
+end
+
 -- ── plantillas ───────────────────────────────────────────────────────────────
 -- { etiqueta, descripción, cuerpo (snippet LSP) }
 local FUNCS = {
@@ -436,6 +496,7 @@ end
 --   func family  → `f`, `fu`, `func`, o tras `func ` sin nada más
 --   type family  → `t`, `ty`, `type`, o tras `type ` sin nada más
 --   constructor  → `New…` o el nombre del struct (`Env…`), y tras `func Ne…`
+--   funcnew      → (solo tecleándolo) `New(todos los campos) (*X, error)`
 --   tras `type Foo` / `func Foo` se está NOMBRANDO algo: no sale nada más
 ---@param ctx blink.cmp.Context
 ---@param mode "func"|"type"|"any"
@@ -500,6 +561,22 @@ local function declaration_items(ctx, mode, frag)
           textEdit = { newText = constructor_text(s), range = range },
         }
       end
+    end
+  end
+  -- `funcnew`: constructor con todos los campos → (*X, error). Solo si lo tecleas (≥ `funcn`)
+  if mode == "any" and #frag >= FUNCNEW_MIN and starts("funcnew", frag) then
+    local structs = structs_in_buffer()
+    for _, s in ipairs(structs) do
+      local single = #structs == 1
+      items[#items + 1] = {
+        label = single and "funcnew" or "funcnew " .. s.name,
+        labelDetails = { description = ("→ (*%s, error)"):format(s.name) },
+        kind = KIND.Snippet,
+        insertTextFormat = FORMAT.Snippet,
+        filterText = single and "funcnew" or "funcnew " .. s.name,
+        sortText = ("%03d"):format(#items + 1),
+        textEdit = { newText = constructor_error_text(s, single), range = range },
+      }
     end
   end
   if want_types then
@@ -1059,6 +1136,7 @@ function Source:resolve(item, callback)
 end
 
 function Source:get_completions(ctx, callback)
+  local incomplete = false
   local before = ctx.line:sub(1, ctx.cursor[2])
   local items = type_body_items(before)
   local lit = #items == 0 and literal_info(ctx)
@@ -1071,11 +1149,13 @@ function Source:get_completions(ctx, callback)
     local mode, frag = decl_start(ctx)
     if mode then
       items = declaration_items(ctx, mode, frag)
+      -- `funcnew` solo existe con ≥ 5 letras: blink debe volver a preguntar mientras la palabra crece
+      incomplete = mode == "any" and #frag < FUNCNEW_MIN and starts("funcnew", frag)
     elseif M.scope(ctx.cursor[1], ctx.cursor[2], ctx.line) == "interface" then
       items = interface_items(ctx)
     end
   end
-  callback { is_incomplete_forward = false, is_incomplete_backward = false, items = items }
+  callback { is_incomplete_forward = incomplete, is_incomplete_backward = false, items = items }
 end
 
 return M

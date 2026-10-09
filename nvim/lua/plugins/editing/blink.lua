@@ -8,7 +8,22 @@ return {
     -- Tab elige la opción de la lista, Enter la inserta (sin flechas)
     keymap = {
       preset = "enter",
-      ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+      -- goerrors: con un `ErrX` a medio declarar, Tab acepta el texto fantasma y Enter lo acepta + línea nueva
+      ["<Tab>"] = {
+        function()
+          return require("utils.goerrors").accept()
+        end,
+        "select_next",
+        "snippet_forward",
+        "fallback",
+      },
+      ["<CR>"] = {
+        function()
+          return require("utils.goerrors").accept(true)
+        end,
+        "accept",
+        "fallback",
+      },
       ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
       ["<Up>"] = false,
       ["<Down>"] = false,
@@ -55,6 +70,12 @@ return {
       },
     },
     completion = {
+      -- sin menú mientras hay un `ErrX` con texto fantasma (utils/goerrors.lua)
+      menu = {
+        auto_show = function()
+          return not require("utils.goerrors").active()
+        end,
+      },
       -- sin preselección, salvo dentro de un struct tag de Go (Enter acepta la sugerencia)
       list = {
         selection = {
@@ -77,5 +98,6 @@ return {
   config = function(_, opts)
     require("blink.cmp").setup(opts)
     require("utils.gosmart").autotrigger()
+    require("utils.goerrors").setup()
   end,
 }
