@@ -11,7 +11,7 @@ local function tool(flutter_sub, dart_sub)
   return function()
     local root = vim.fs.root(0, { "pubspec.yaml" })
     if not root then
-      return log.warn "No hay pubspec.yaml"
+      return log.warn "No pubspec.yaml found"
     end
     local pubspec = project.read(root .. "/pubspec.yaml") or ""
     local is_flutter = pubspec:find "\n%s*flutter:" ~= nil

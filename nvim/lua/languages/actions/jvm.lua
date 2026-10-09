@@ -18,7 +18,7 @@ local function build_tool(goal)
   return function()
     local root = vim.fs.root(0, MARKERS)
     if not root then
-      return log.warn "No hay proyecto Gradle/Maven (build.gradle / pom.xml)"
+      return log.warn "No Gradle/Maven project (build.gradle / pom.xml)"
     end
     local cmd
     if project.has(root, "pom.xml") then

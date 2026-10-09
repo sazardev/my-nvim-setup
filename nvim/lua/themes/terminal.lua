@@ -2,7 +2,7 @@
 -- carpeta de temas de usuario). La lógica vive en lua/appearance/.
 local loaded = require("appearance.alacritty").load()
 if not loaded then
-  error "terminal theme: no se encontró la config de Alacritty"
+  error "terminal theme: Alacritty config not found"
 end
 
 local theme =

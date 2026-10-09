@@ -81,25 +81,25 @@ function M.setup()
     if not require("utils.navigation").back() then
       vim.cmd "noh"
     end
-  end, { desc = "volver tras saltar / quitar resaltado" })
+  end, { desc = "go back after jump / clear highlight" })
   map("n", "<leader>H", function()
     require("utils.navigation").history_picker()
-  end, { desc = "historial de archivos (sesión)" })
+  end, { desc = "file history (session)" })
 
   -- Multicursor nativo (sin plugin): Ctrl+↓/↑ abre un bloque visual y lo extiende línea a
   -- línea; luego `I` (insertar al inicio), `A` (al final), `c` (cambiar) o `$A` (fin de
   -- cada línea) escriben en TODAS las líneas a la vez. <Esc> sale.
-  map("n", "<C-Down>", "<C-v>j", { desc = "multicursor: bloque hacia abajo" })
-  map("n", "<C-Up>", "<C-v>k", { desc = "multicursor: bloque hacia arriba" })
-  map("x", "<C-Down>", "j", { desc = "multicursor: extender hacia abajo" })
-  map("x", "<C-Up>", "k", { desc = "multicursor: extender hacia arriba" })
+  map("n", "<C-Down>", "<C-v>j", { desc = "multicursor: block down" })
+  map("n", "<C-Up>", "<C-v>k", { desc = "multicursor: block up" })
+  map("x", "<C-Down>", "j", { desc = "multicursor: extend down" })
+  map("x", "<C-Up>", "k", { desc = "multicursor: extend up" })
 
   -- CTRL+click → ir a definición (LSP); <Esc> o <C-o> vuelve atrás, <C-i> adelante
   map(
     "n",
     "<C-LeftMouse>",
     require("utils.lsp").goto_definition_at_mouse,
-    { desc = "ir a donde se DEFINE (Ctrl+click)" }
+    { desc = "go to DEFINITION (Ctrl+click)" }
   )
 end
 

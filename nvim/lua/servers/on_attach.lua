@@ -28,8 +28,8 @@ function M.setup()
       local function nav(lhs, fn, desc)
         vim.keymap.set("n", lhs, fn, { buffer = args.buf, desc = "LSP " .. desc })
       end
-      nav("gd", lsp.goto_definition, "gd: ir a donde se DEFINE")
-      nav("grr", lsp.references, "grr: ver DÓNDE SE USA (lista)")
+      nav("gd", lsp.goto_definition, "gd: go to DEFINITION")
+      nav("grr", lsp.references, "grr: see WHERE IT'S USED (list)")
       label_rename_group(args.buf)
     end,
   })

@@ -23,7 +23,7 @@ return {
       "default theme (" .. default_name .. ")",
       function()
         if appearance().use(appearance().default()) then
-          require("utils.log").info("Tema: " .. appearance().default())
+          require("utils.log").info("Theme: " .. appearance().default())
         end
       end,
     },
@@ -32,7 +32,7 @@ return {
       "terminal theme (Alacritty)",
       function()
         if appearance().use(appearance().TERMINAL) then
-          require("utils.log").info "Tema: terminal"
+          require("utils.log").info "Theme: terminal"
         end
       end,
     },
@@ -41,7 +41,7 @@ return {
       "re-sync terminal theme",
       function()
         if appearance().use(appearance().TERMINAL) then
-          require("utils.log").info "Tema terminal re-sincronizado"
+          require("utils.log").info "Terminal theme re-synced"
         end
       end,
     },

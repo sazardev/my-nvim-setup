@@ -61,7 +61,7 @@ return {
     function()
       local _, mod_root = paths()
       if not mod_root then
-        return log.warn "No hay go.mod en el proyecto"
+        return log.warn "No go.mod in the project"
       end
       terminal.run("go mod tidy", mod_root)
     end,

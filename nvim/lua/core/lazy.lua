@@ -68,7 +68,7 @@ local function bootstrap()
       path,
     }
     if vim.v.shell_error ~= 0 then
-      error("No se pudo clonar lazy.nvim:\n" .. out)
+      error("Failed to clone lazy.nvim:\n" .. out)
     end
   end
   vim.opt.rtp:prepend(path)

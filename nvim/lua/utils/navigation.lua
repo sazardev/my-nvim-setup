@@ -121,13 +121,13 @@ function M.history_picker()
   end, history)
 
   if #items == 0 then
-    return log.info "Aún no has visitado otros archivos en esta sesión"
+    return log.info "You haven't visited any other files in this session yet"
   end
 
   local conf = require("telescope.config").values
   require("telescope.pickers")
     .new({
-      prompt_title = "Historial de archivos (más reciente arriba)",
+      prompt_title = "File history (most recent first)",
       sorting_strategy = "ascending",
       layout_config = { prompt_position = "top" },
     }, {

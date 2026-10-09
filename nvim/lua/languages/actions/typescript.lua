@@ -41,7 +41,7 @@ local function script(name, fallback)
     if fallback then
       return terminal.run(fallback, root)
     end
-    log.warn(("package.json no tiene el script `%s`"):format(name))
+    log.warn(("package.json has no `%s` script"):format(name))
   end
 end
 
@@ -49,7 +49,7 @@ local function pick_script()
   local pm, root = package_manager()
   local names = scripts(root)
   if #names == 0 then
-    return log.warn "No hay scripts en package.json"
+    return log.warn "No scripts in package.json"
   end
   vim.ui.select(names, { prompt = pm .. " run" }, function(choice)
     if choice then
@@ -74,7 +74,7 @@ return {
   { "c", "typecheck (tsc)", actions.run("npx", "npx --no-install tsc --noEmit", MARKERS) },
   {
     "x",
-    "eslint --fix (archivo)",
+    "eslint --fix (file)",
     function()
       local _, root = package_manager()
       terminal.run("npx --no-install eslint --fix " .. vim.fn.shellescape(vim.fn.expand "%:p"), root)

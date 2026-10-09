@@ -36,7 +36,7 @@ function M.reading_mode()
     end
     vim.diagnostic.enable(saved.diagnostics, { bufnr = buf })
     vim.w[win].reading_saved = nil
-    return log.info "Modo lectura: desactivado"
+    return log.info "Reading mode: off"
   end
 
   saved = { diagnostics = vim.diagnostic.is_enabled { bufnr = buf } }
@@ -59,7 +59,7 @@ function M.reading_mode()
     group = vim.api.nvim_create_augroup("ReadingMode", { clear = true }),
     callback = recenter,
   })
-  log.info "Modo lectura: activado"
+  log.info "Reading mode: on"
 end
 
 --- Corrector ortográfico (es + en) en este buffer/ventana
@@ -69,14 +69,14 @@ function M.toggle_spell()
   if on then
     vim.bo.spelllang = "es,en"
   end
-  log.info("Ortografía: " .. (on and "activada (es, en)" or "desactivada"))
+  log.info("Spell check: " .. (on and "on (es, en)" or "off"))
 end
 
 --- Palabras del buffer (o de la selección) y tiempo de lectura a ~200 ppm
 function M.word_count()
   local wc = vim.fn.wordcount()
   local words = wc.visual_words or wc.words
-  log.info(("%d palabras · ~%d min de lectura"):format(words, math.max(1, math.ceil(words / 200))))
+  log.info(("%d words · ~%d min read"):format(words, math.max(1, math.ceil(words / 200))))
 end
 
 --- Marca/desmarca el checkbox de la línea; si no es una tarea, la convierte en una

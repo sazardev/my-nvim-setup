@@ -87,7 +87,7 @@ function M.load(name)
   package.loaded["ui.arts." .. name] = nil
   local ok, lines = pcall(require, "ui.arts." .. name)
   if not ok or type(lines) ~= "table" then
-    log.warn(("Arte '%s' no se pudo cargar"):format(name))
+    log.warn(("Art '%s' could not be loaded"):format(name))
     return {}
   end
   return pad(lines)
@@ -117,18 +117,18 @@ end
 ---@param name string
 function M.set(name)
   if not valid(name) then
-    return log.warn(("Arte desconocido: %s"):format(name))
+    return log.warn(("Unknown art: %s"):format(name))
   end
   write_saved(name)
   redraw()
-  log.info("Arte del dashboard: " .. name)
+  log.info("Dashboard art: " .. name)
 end
 
 --- Selector con vista previa (Telescope); cae a vim.ui.select sin Telescope.
 function M.pick()
   local ok, pickers = pcall(require, "telescope.pickers")
   if not ok then
-    return vim.ui.select(M.names(), { prompt = "Arte del dashboard" }, function(choice)
+    return vim.ui.select(M.names(), { prompt = "Dashboard art" }, function(choice)
       if choice then
         M.set(choice)
       end
@@ -144,14 +144,14 @@ function M.pick()
   local names = M.names()
   pickers
     .new({}, {
-      prompt_title = "Arte del dashboard",
+      prompt_title = "Dashboard art",
       finder = finders.new_table { results = names },
       sorter = conf.generic_sorter {},
       default_selection_index = (vim.fn.index(names, M.current()) + 1),
       layout_strategy = "horizontal",
       layout_config = { width = 0.7, height = 0.6, preview_width = 0.6 },
       previewer = previewers.new_buffer_previewer {
-        title = "Vista previa",
+        title = "Preview",
         define_preview = function(self, entry)
           local lines = M.load(entry[1])
           local buf = self.state.bufnr

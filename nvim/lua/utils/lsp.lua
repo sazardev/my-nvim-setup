@@ -20,7 +20,7 @@ local function supported(method, what)
 
   local clients = vim.lsp.get_clients { bufnr = buf }
   if #clients == 0 then
-    log.warn(("Sin LSP para este archivo (%s): no puedo %s"):format(vim.bo[buf].filetype, what))
+    log.warn(("No LSP for this file (%s): can't %s"):format(vim.bo[buf].filetype, what))
     return false
   end
 
@@ -35,9 +35,9 @@ local function supported(method, what)
   end, clients)
 
   if #starting > 0 then
-    log.warn(("%s sigue iniciando; prueba en unos segundos"):format(names))
+    log.warn(("%s is still starting; try again in a few seconds"):format(names))
   else
-    log.warn(("%s no soporta: %s"):format(names, what))
+    log.warn(("%s doesn't support: %s"):format(names, what))
   end
   return false
 end
@@ -72,7 +72,7 @@ end
 --- Ir a la definición del símbolo bajo el cursor. Un solo destino: salta y <Esc>
 --- vuelve; varios: quickfix (como el comportamiento por defecto).
 function M.goto_definition()
-  if not supported("textDocument/definition", "ir a la definición") then
+  if not supported("textDocument/definition", "go to definition") then
     return
   end
 
@@ -80,7 +80,7 @@ function M.goto_definition()
   vim.lsp.buf.definition {
     on_list = function(result)
       if #result.items == 0 then
-        return log.info(("No encuentro la definición de '%s'"):format(vim.fn.expand "<cword>"))
+        return log.info(("Definition of '%s' not found"):format(vim.fn.expand "<cword>"))
       end
       if #result.items > 1 then
         vim.fn.setqflist({}, " ", result)
@@ -124,14 +124,14 @@ end
 --- Dónde se usa el símbolo bajo el cursor: lista filtrable con vista previa;
 --- Enter salta, <C-q> la manda a quickfix. No incluye la declaración.
 function M.references()
-  if not supported("textDocument/references", "buscar referencias") then
+  if not supported("textDocument/references", "find references") then
     return
   end
   local origin = nav.origin()
   lookup(
     "textDocument/references",
     { context = { includeDeclaration = false } },
-    "'%s' no se usa en ningún otro sitio",
+    "'%s' is not used anywhere else",
     function()
       require("telescope.builtin").lsp_references(vim.tbl_extend("force", with_back(origin), { include_declaration = false }))
     end

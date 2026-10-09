@@ -15,7 +15,7 @@ function M.setup()
       end
       vim.cmd "silent! luafile $MYVIMRC"
       vim.fn.delete(marker)
-      vim.notify "Config recargada automáticamente tras git pull"
+      vim.notify "Config reloaded automatically after git pull"
     end,
   })
 end

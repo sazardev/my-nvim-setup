@@ -45,7 +45,7 @@ function M.watch()
   end
   watcher.start(function()
     if M.sync() then
-      log.info "Tema terminal actualizado"
+      log.info "Terminal theme updated"
     end
   end)
 end
@@ -70,10 +70,10 @@ function M.use(name)
     alacritty.reset()
     local loaded, err = alacritty.load()
     if not terminal_enabled() then
-      log.warn "El tema terminal está desactivado (settings.theme.terminal.enabled)"
+      log.warn "Terminal theme is disabled (settings.theme.terminal.enabled)"
       return false
     elseif not loaded then
-      log.warn(err or "No se pudo leer la paleta de la terminal")
+      log.warn(err or "Could not read the terminal palette")
       return false
     end
   end
@@ -89,7 +89,7 @@ end
 function M.toggle()
   local target = M.current() == M.TERMINAL and M.default() or M.TERMINAL
   if M.use(target) then
-    log.info("Tema: " .. target)
+    log.info("Theme: " .. target)
   end
 end
 
@@ -115,16 +115,16 @@ function M.info()
   local loaded = name == M.TERMINAL and alacritty.load() or nil
   if loaded then
     local p = loaded.palette
-    local live = watcher.active() and ("vivo cada %d ms"):format(settings.theme.terminal.watch_ms) or "SIN seguimiento"
-    return ("Tema: terminal · %s · fondo %s · %d archivos vigilados · %s"):format(
+    local live = watcher.active() and ("live every %d ms"):format(settings.theme.terminal.watch_ms) or "NOT watching"
+    return ("Theme: terminal · %s · background %s · %d watched files · %s"):format(
       vim.fs.basename(loaded.theme_file or loaded.config),
       p.background,
       #loaded.files,
       live
     )
   end
-  local detected = alacritty.find_config() and "Alacritty detectado" or "sin config de Alacritty"
-  return ("Tema: %s · %s"):format(name, detected)
+  local detected = alacritty.find_config() and "Alacritty detected" or "no Alacritty config"
+  return ("Theme: %s · %s"):format(name, detected)
 end
 
 return M

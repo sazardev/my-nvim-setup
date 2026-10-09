@@ -31,7 +31,7 @@ end
 
 function M.restore()
   if not M.exists() then
-    return log.warn "No hay sesión guardada para esta carpeta"
+    return log.warn "No saved session for this folder"
   end
   persistence().load()
 end
@@ -48,7 +48,7 @@ end
 function M.last()
   local p = persistence()
   if not p or not p.last() then
-    return log.warn "No hay sesiones guardadas"
+    return log.warn "No saved sessions"
   end
   p.load { last = true }
 end
@@ -57,7 +57,7 @@ function M.save()
   local p = persistence()
   if p then
     p.save()
-    log.info "Sesión guardada"
+    log.info "Session saved"
   end
 end
 
@@ -66,7 +66,7 @@ function M.stop()
   local p = persistence()
   if p then
     p.stop()
-    log.info "Esta sesión no se guardará al salir"
+    log.info "This session won't be saved on exit"
   end
 end
 

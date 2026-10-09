@@ -151,7 +151,7 @@ function M.load()
   end
   local config = M.find_config()
   if not config then
-    return nil, "No encontré la config de Alacritty (ver theme.terminal.config en core/settings.lua)"
+    return nil, "Alacritty config not found (see theme.terminal.config in core/settings.lua)"
   end
   local ctx = { files = {} }
   local merged = load_file(config, ctx, 0)
